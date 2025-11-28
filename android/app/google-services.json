@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "207372778390",
+    "project_id": "alamal-f82f0",
+    "storage_bucket": "alamal-f82f0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207372778390:android:305806f44c9ee4cf723bb7",
+        "android_client_info": {
+          "package_name": "com.alamal.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqiy1RdNSiqZEK6H_6sLh8_xsbJtOpQo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207372778390:android:6fe10e44b9c2e1e4723bb7",
+        "android_client_info": {
+          "package_name": "com.charity.charity_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqiy1RdNSiqZEK6H_6sLh8_xsbJtOpQo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

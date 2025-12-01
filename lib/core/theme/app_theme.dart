@@ -1,3 +1,4 @@
+import 'package:charity_app/core/config/res/refactor_color_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -40,15 +41,11 @@ class AppTheme {
         backgroundColor: const Color(0xFF1E88E5),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        textStyle: GoogleFonts.cairo(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     ),
+    extensions: const [lightColors],
   );
 
   static final ThemeData darkTheme = ThemeData(
@@ -89,14 +86,10 @@ class AppTheme {
         backgroundColor: const Color(0xFF90CAF9),
         foregroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        textStyle: GoogleFonts.cairo(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     ),
+    extensions: const [darkColors],
   );
 }

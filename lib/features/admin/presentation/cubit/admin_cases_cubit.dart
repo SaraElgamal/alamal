@@ -1,57 +1,116 @@
 import 'package:bloc/bloc.dart';
- import '../../domain/entities/case_entity.dart' ;
-import '../../domain/usecases/add_case_usecase.dart';
-import '../../domain/usecases/export_cases_to_excel_usecase.dart';
-import '../../domain/usecases/get_cases_usecase.dart';
+import '../../data/models/case_model.dart';
+import '../../data/repo/cases_repository.dart';
 import 'admin_cases_state.dart';
 
 class AdminCasesCubit extends Cubit<AdminCasesState> {
-  final AddCaseUseCase addCase;
-  final GetCasesUseCase getCases;
-  final ExportCasesToExcelUseCase exportCases;
+  final CasesRepository casesRepository;
 
-  AdminCasesCubit({
-    required this.addCase,
-    required this.getCases,
-    required this.exportCases,
-  }) : super(const AdminCasesState());
+  AdminCasesCubit({required this.casesRepository})
+    : super(const AdminCasesState());
 
   Future<void> loadCases() async {
-    emit(state.copyWith(status: AdminCasesStatus.loading));
-    final result = await getCases();
+    emit(
+      state.copyWith(
+        status: AdminCasesStatus.loading,
+        cases: [],
+        filteredCases: [],
+        hasReachedMax: false,
+        isLoadingMore: false,
+      ),
+    );
+    final result = await casesRepository.getCases(limit: 20);
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: AdminCasesStatus.error,
-        errorMessage: failure.message,
-      )),
-      (cases) => emit(state.copyWith(
-        status: AdminCasesStatus.success,
-        cases: cases,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (cases) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.success,
+          cases: cases,
+          hasReachedMax: cases.length < 20,
+        ),
+      ),
     );
   }
 
+  Future<void> loadMoreCases() async {
+    if (state.isLoadingMore || state.hasReachedMax) return;
+    emit(state.copyWith(isLoadingMore: true));
 
-  Future<void> addNewCase(CaseEntity caseEntity) async {
-    emit(state.copyWith(status: AdminCasesStatus.loading));
-    final result = await addCase(caseEntity);
+    final result = await casesRepository.getCases(
+      limit: 20,
+      lastCaseId: state.cases.isNotEmpty ? state.cases.last.id : null,
+    );
+
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: AdminCasesStatus.error,
-        errorMessage: failure.message,
-      )),
+      (failure) => emit(
+        state.copyWith(isLoadingMore: false, errorMessage: failure.message),
+      ),
+      (newCases) {
+        final allCases = List<CaseModel>.from(state.cases)..addAll(newCases);
+        emit(
+          state.copyWith(
+            isLoadingMore: false,
+            cases: allCases,
+            hasReachedMax: newCases.length < 20,
+          ),
+        );
+        _applyFilters();
+      },
+    );
+  }
+
+  void filterCases({String? maritalStatus, bool? sortByLowestIncome}) {
+    emit(
+      state.copyWith(
+        filterMaritalStatus: maritalStatus,
+        filterSortByLowestIncome: sortByLowestIncome,
+        isFiltering: true,
+      ),
+    );
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    List<CaseModel> filtered = List.from(state.cases);
+
+    if (state.filterMaritalStatus != null) {
+      filtered = filtered.where((c) {
+        if (state.filterMaritalStatus == 'متزوج') {
+          return c.spouse != null;
+        } else if (state.filterMaritalStatus == 'أعزب' ||
+            state.filterMaritalStatus == 'أرمل' ||
+            state.filterMaritalStatus == 'مطلق') {
+          return c.spouse == null;
+        }
+        return true;
+      }).toList();
+    }
+
+    if (state.filterSortByLowestIncome == true) {
+      filtered.sort(
+        (a, b) => a.totalFamilyIncome.compareTo(b.totalFamilyIncome),
+      );
+    }
+
+    emit(state.copyWith(filteredCases: filtered));
+  }
+
+  Future<void> addNewCase(CaseModel caseModel) async {
+    emit(state.copyWith(status: AdminCasesStatus.loading));
+    final result = await casesRepository.addCase(caseModel);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
       (_) {
-        // Reload cases after adding
-        loadCases(); 
-        // Or just emit success and let UI handle reload? 
-        // Better to reload to keep list updated.
-        // But we also want to show a success message.
-        // Let's emit success with message, then reload?
-        // Or reload and set success message.
-        // If we reload, status goes back to loading.
-        // Let's just emit success message for now, assuming list is updated or we manually add it.
-        // For simplicity, let's just reload.
-        // But to show "Case Added" snackbar, we need a state change.
         emit(state.copyWith(successMessage: 'Case added successfully'));
         loadCases();
       },
@@ -60,16 +119,81 @@ class AdminCasesCubit extends Cubit<AdminCasesState> {
 
   Future<void> exportToExcel() async {
     emit(state.copyWith(status: AdminCasesStatus.loading));
-    final result = await exportCases();
+    final result = await casesRepository.exportCasesToExcel();
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: AdminCasesStatus.error,
-        errorMessage: failure.message,
-      )),
-      (path) => emit(state.copyWith(
-        status: AdminCasesStatus.success,
-        successMessage: 'Excel exported to $path',
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (path) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.excelExported,
+          excelPath: path,
+          successMessage: 'Excel exported to $path',
+        ),
+      ),
     );
+  }
+
+  Future<void> deleteCase(String id) async {
+    emit(state.copyWith(status: AdminCasesStatus.loading));
+    final result = await casesRepository.deleteCase(id);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (_) {
+        final updatedCases = state.cases
+            .where((element) => element.id != id)
+            .toList();
+        emit(
+          state.copyWith(
+            status: AdminCasesStatus.success,
+            cases: updatedCases,
+            deleteSuccessMessage: 'Case deleted successfully',
+          ),
+        );
+        _applyFilters();
+      },
+    );
+  }
+
+  Future<void> deleteAllCases() async {
+    emit(state.copyWith(status: AdminCasesStatus.loading));
+    final result = await casesRepository.deleteAllCases();
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (_) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.success,
+          cases: [],
+          filteredCases: [],
+          deleteSuccessMessage: 'All cases deleted successfully',
+        ),
+      ),
+    );
+  }
+
+  void searchCases(String query) {
+    if (query.isEmpty) {
+      emit(state.copyWith(isFiltering: false, filteredCases: []));
+      return;
+    }
+    final filtered = state.cases.where((c) {
+      return c.applicant.name.toLowerCase().contains(query.toLowerCase()) ||
+          c.applicant.nationalId.contains(query) ||
+          c.applicant.phone.contains(query);
+    }).toList();
+    emit(state.copyWith(isFiltering: true, filteredCases: filtered));
   }
 }

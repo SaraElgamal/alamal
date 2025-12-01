@@ -9,6 +9,7 @@ class CustomTextFormField extends StatelessWidget {
   final bool obscureText;
   final void Function(String)? onChanged;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
 
   const CustomTextFormField({
     super.key,
@@ -20,6 +21,7 @@ class CustomTextFormField extends StatelessWidget {
     this.obscureText = false,
     this.onChanged,
     this.suffixIcon,
+    this.prefixIcon,
   });
 
   @override
@@ -37,6 +39,7 @@ class CustomTextFormField extends StatelessWidget {
           labelText: label,
           alignLabelWithHint: true,
           suffixIcon: suffixIcon,
+          prefixIcon: prefixIcon,
         ),
       ),
     );

@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:charity_app/core/navigation/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import '../../../admin/presentation/pages/admin_dashboard_screen.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../../core/widgets/custom_text_form_field.dart';
 
 class AdminLoginScreen extends StatefulWidget {
@@ -14,20 +15,20 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
+  final bool _isLoading = false;
   bool _obscurePassword = true;
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'البريد الإلكتروني مطلوب';
     }
-    
+
     // Email regex pattern
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
       return 'يرجى إدخال بريد إلكتروني صحيح';
     }
-    
+
     return null;
   }
 
@@ -35,19 +36,16 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     if (value == null || value.isEmpty) {
       return 'كلمة المرور مطلوبة';
     }
-    
+
     if (value.length < 6) {
       return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
     }
-    
+
     return null;
   }
 
   Future<void> _login() async {
-      Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
-          );
+    context.pushReplacement(AppRoutes.adminDashboard);
     // if (_formKey.currentState!.validate()) {
     //   setState(() => _isLoading = true);
     //   try {
@@ -64,7 +62,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     //   } on FirebaseAuthException catch (e) {
     //     if (mounted) {
     //       String errorMessage = 'حدث خطأ في تسجيل الدخول';
-          
+
     //       if (e.code == 'user-not-found') {
     //         errorMessage = 'لا يوجد حساب بهذا البريد الإلكتروني';
     //       } else if (e.code == 'wrong-password') {
@@ -76,7 +74,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     //       } else if (e.code == 'too-many-requests') {
     //         errorMessage = 'محاولات كثيرة. يرجى المحاولة لاحقاً';
     //       }
-          
+
     //       ScaffoldMessenger.of(context).showSnackBar(
     //         SnackBar(
     //           content: Text(errorMessage),

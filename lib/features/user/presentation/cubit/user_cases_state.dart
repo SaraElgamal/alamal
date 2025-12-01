@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/case_entity.dart';
+import '../../data/models/case_model.dart';
 
 enum UserCasesStatus {
   initial,
@@ -12,8 +12,8 @@ enum UserCasesStatus {
 
 class UserCasesState extends Equatable {
   final UserCasesStatus status;
-  final List<UserCaseEntity> cases;
-  final UserCaseEntity? selectedCase;
+  final List<CaseModel> cases;
+  final CaseModel? selectedCase;
   final String? errorMessage;
   final String? successMessage;
   final String? excelPath;
@@ -29,8 +29,8 @@ class UserCasesState extends Equatable {
 
   UserCasesState copyWith({
     UserCasesStatus? status,
-    List<UserCaseEntity>? cases,
-    UserCaseEntity? selectedCase,
+    List<CaseModel>? cases,
+    CaseModel? selectedCase,
     String? errorMessage,
     String? successMessage,
     String? excelPath,
@@ -46,5 +46,12 @@ class UserCasesState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, cases, selectedCase, errorMessage, successMessage, excelPath];
+  List<Object?> get props => [
+    status,
+    cases,
+    selectedCase,
+    errorMessage,
+    successMessage,
+    excelPath,
+  ];
 }

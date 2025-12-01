@@ -1,16 +1,35 @@
-import '../../domain/entities/expenses_entity.dart';
+import 'package:equatable/equatable.dart';
 
-class ExpensesModel extends ExpensesEntity {
+class ExpensesModel extends Equatable {
+  final double rent;
+  final double electricity;
+  final double water;
+  final double gas;
+  final double education;
+  final double treatment;
+  final double debtRepayment;
+  final double other;
+
   const ExpensesModel({
-    super.rent,
-    super.electricity,
-    super.water,
-    super.gas,
-    super.education,
-    super.treatment,
-    super.debtRepayment,
-    super.other,
+    this.rent = 0,
+    this.electricity = 0,
+    this.water = 0,
+    this.gas = 0,
+    this.education = 0,
+    this.treatment = 0,
+    this.debtRepayment = 0,
+    this.other = 0,
   });
+
+  double get total =>
+      rent +
+      electricity +
+      water +
+      gas +
+      education +
+      treatment +
+      debtRepayment +
+      other;
 
   factory ExpensesModel.fromJson(Map<String, dynamic> json) {
     return ExpensesModel(
@@ -38,16 +57,15 @@ class ExpensesModel extends ExpensesEntity {
     };
   }
 
-  factory ExpensesModel.fromEntity(ExpensesEntity entity) {
-    return ExpensesModel(
-      rent: entity.rent,
-      electricity: entity.electricity,
-      water: entity.water,
-      gas: entity.gas,
-      education: entity.education,
-      treatment: entity.treatment,
-      debtRepayment: entity.debtRepayment,
-      other: entity.other,
-    );
-  }
+  @override
+  List<Object?> get props => [
+    rent,
+    electricity,
+    water,
+    gas,
+    education,
+    treatment,
+    debtRepayment,
+    other,
+  ];
 }

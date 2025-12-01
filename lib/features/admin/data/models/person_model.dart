@@ -1,14 +1,22 @@
-import '../../domain/entities/person_entity.dart';
+import 'package:equatable/equatable.dart';
 
-class PersonModel extends PersonEntity {
+class PersonModel extends Equatable {
+  final String name;
+  final String nationalId;
+  final int age;
+  final String profession;
+  final double income;
+  final String phone;
+  final String? address;
+
   const PersonModel({
-    required super.name,
-    required super.nationalId,
-    required super.age,
-    required super.profession,
-    required super.income,
-    required super.phone,
-    super.address,
+    required this.name,
+    required this.nationalId,
+    required this.age,
+    required this.profession,
+    required this.income,
+    required this.phone,
+    this.address,
   });
 
   factory PersonModel.fromJson(Map<String, dynamic> json) {
@@ -35,15 +43,14 @@ class PersonModel extends PersonEntity {
     };
   }
 
-  factory PersonModel.fromEntity(PersonEntity entity) {
-    return PersonModel(
-      name: entity.name,
-      nationalId: entity.nationalId,
-      age: entity.age,
-      profession: entity.profession,
-      income: entity.income,
-      phone: entity.phone,
-      address: entity.address,
-    );
-  }
+  @override
+  List<Object?> get props => [
+    name,
+    nationalId,
+    age,
+    profession,
+    income,
+    phone,
+    address,
+  ];
 }

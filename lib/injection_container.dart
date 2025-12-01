@@ -4,14 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/theme/theme_cubit.dart';
-import 'features/user/data/datasources/cases_remote_data_source.dart';
-import 'features/user/data/repositories/cases_repository_impl.dart';
-import 'features/user/domain/repositories/cases_repository.dart';
-import 'features/user/domain/usecases/add_case_usecase.dart';
-import 'features/user/domain/usecases/export_cases_to_excel_usecase.dart';
-import 'features/user/domain/usecases/get_case_by_id_usecase.dart';
-import 'features/user/domain/usecases/get_cases_usecase.dart';
-import 'features/user/presentation/cubit/user_cases_cubit.dart';
+import 'features/user/di/user_di.dart';
+import 'features/admin/di/admin_di.dart';
 
 final sl = GetIt.instance;
 
@@ -20,31 +14,10 @@ Future<void> init() async {
   sl.registerFactory(() => ThemeCubit(sl()));
 
   // Features - User
-  // Cubit
-  sl.registerFactory(
-    () => UserCasesCubit(
-      addCase: sl(),
-      getCases: sl(),
-      getCaseById: sl(),
-      exportCases: sl(),
-    ),
-  );
+  initUserDI(sl);
 
-  // Use Cases
-  sl.registerLazySingleton(() => AddCaseUseCase(sl()));
-  sl.registerLazySingleton(() => GetCasesUseCase(sl()));
-  sl.registerLazySingleton(() => GetCaseByIdUseCase(sl()));
-  sl.registerLazySingleton(() => ExportCasesToExcelUseCase(sl()));
-
-  // Repository
-  sl.registerLazySingleton<CasesRepository>(
-    () => CasesRepositoryImpl(remoteDataSource: sl()),
-  );
-
-  // Data Sources
-  sl.registerLazySingleton<CasesRemoteDataSource>(
-    () => CasesRemoteDataSourceImpl(firestore: sl()),
-  );
+  // Features - Admin
+  initAdminDI(sl);
 
   // External
   final sharedPreferences = await SharedPreferences.getInstance();

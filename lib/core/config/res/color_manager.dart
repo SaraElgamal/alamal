@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+
+class AppColors {
+  static const Color primary = Color(0xFF0B60B0);
+  static const Color primary50 = Color(0xFFE7EFF7);
+  static const Color lightGrey = Color(0xFFFBFBFB);
+  static const Color amber = Color(0xFFFFBB00);
+  static const Color secondary = Color(0xFFF0EDCE);
+  static const Color scaffoldBackground = Color(0xffFFFFFF);
+  static const Color transparent = Colors.transparent;
+  static const Color white = Colors.white;
+  static const Color whiteF4F5F6 = Color(0xffF4F5F6);
+  static const Color red50 = Color(0xffF87171);
+  static const Color error = Color(0xffF04438);
+  static const Color error10 = Color(0xffFEE4E2);
+  static const Color red = Colors.red;
+  static const Color black = Color(0xff252628);
+  static const Color grey = Color(0xffF8F9FB);
+  static const Color hintText = Color(0xffBBBCBC);
+  static const Color actionSecondaryColor = Color(0xffF4F5F6);
+  static const Color black100 = Color(0xff000000);
+  static const Color black90 = Color(0xff1A1A1A);
+  static const Color black80 = Color(0xff333333);
+  static const Color black70 = Color(0xff4D4D4D);
+  static const Color black60 = Color(0xff666666);
+  static const Color black50 = Color(0xff6D6E6F);
+  static const Color black40 = Color(0xff999999);
+  static const Color black30 = Color(0xffB3B3B3);
+  static const Color black20 = Color(0xffCCCCCC);
+  static const Color black10 = Color(0xffE5E5E5);
+  static const Color black5 = Color(0xffF2F2F2);
+  static const Color black1 = Color(0xffE6E6E6);
+  static const Color darkPrim = Color(0xff292D32);
+  static const Color textFieldBorder = Color(0xffD8DADC);
+  static const Color successECFDF3 = Color(0xffECFDF3);
+  static const Color success = Color(0xff22C55E);
+  static const Color success60 = Color(0xff12B76A);
+  static const Color successlight = Color(0xffF6FEF9);
+  static const Color alertlight = Color(0xffFFFAEB);
+  static const Color disabledTextFeiledColor = Color(0xffE0E1E1);
+  static const Color error271D29 = Color(0xff271D29);
+  static const Color card = Color(0xffECF1F7);
+  static const Color secondaryD282F3B = Color(0xff282F3B);
+  static const Color primary10D = Color(0xff374151);
+  static Color instaBgL = const Color(0xffA138A2).withValues(alpha: 0.05);
+  static Color instaBgD = const Color(0xffA138A2).withValues(alpha: 0.10);
+  static Color tiktokBgL = const Color(0xffFF004F).withValues(alpha: 0.05);
+  static Color tiktokBgD = const Color(0xffFF004F).withValues(alpha: 0.10);
+  static Color snapBgL = const Color(0xffFFFA37).withValues(alpha: 0.05);
+  static Color snapBgD = const Color(0xffFFFA37).withValues(alpha: 0.10);
+  static Color xBgL = const Color(0xff242E36).withValues(alpha: 0.10);
+  static Color xBgD = const Color(0xffffffff).withValues(alpha: 0.10);
+  static const Color grey6B = Color(0xff6B7280);
+  static const Color green22 = Color(0xff22C55E);
+  static const Color blue02 = Color(0xff0288D1);
+  static const Color green00 = Color(0xff00897B);
+  static const Color orangeF7 = Color(0xffF79009);
+  static const Color orangeFF = Color(0xffFFC107);
+  static const Color green43 = Color(0xff43A047);
+  static const Color error50 = Color(0xffFEEFEF);
+  static const Color grey75 = Color(0xff757575);
+  static const Color purple45 = Color(0xff4527A0);
+}
+
+

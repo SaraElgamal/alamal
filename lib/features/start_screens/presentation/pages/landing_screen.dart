@@ -1,9 +1,9 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:charity_app/core/navigation/routes/app_routes.dart';
 import 'package:charity_app/core/theme/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
- import '../../../user/presentation/pages/case_registration_screen.dart';
-import 'admin_login_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
@@ -35,7 +35,7 @@ class LandingScreen extends StatelessWidget {
                     builder: (context, themeMode) {
                       IconData icon;
                       String tooltip;
-                      
+
                       if (themeMode == AppThemeMode.light) {
                         icon = Icons.light_mode;
                         tooltip = 'الوضع الفاتح';
@@ -46,7 +46,7 @@ class LandingScreen extends StatelessWidget {
                         icon = Icons.brightness_auto;
                         tooltip = 'تلقائي';
                       }
-                      
+
                       return IconButton(
                         icon: Icon(icon, color: Colors.white),
                         onPressed: () {
@@ -82,10 +82,7 @@ class LandingScreen extends StatelessWidget {
                   delay: const Duration(milliseconds: 400),
                   child: const Text(
                     'معاً نصنع الفرق',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white70,
-                    ),
+                    style: TextStyle(fontSize: 18, color: Colors.white70),
                   ),
                 ),
                 const SizedBox(height: 64),
@@ -96,12 +93,7 @@ class LandingScreen extends StatelessWidget {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CaseRegistrationScreen(),
-                          ),
-                        );
+                        context.push(AppRoutes.caseRegistration);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -119,12 +111,7 @@ class LandingScreen extends StatelessWidget {
                     height: 56,
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AdminLoginScreen(),
-                          ),
-                        );
+                        context.push(AppRoutes.adminLogin);
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.white, width: 2),
@@ -135,7 +122,10 @@ class LandingScreen extends StatelessWidget {
                       ),
                       child: const Text(
                         'دخول الإدارة',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

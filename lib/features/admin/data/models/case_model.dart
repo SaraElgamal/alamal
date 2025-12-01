@@ -1,37 +1,62 @@
-import '../../domain/entities/case_entity.dart';
-import '../../domain/entities/person_entity.dart';
+import 'package:equatable/equatable.dart';
 import 'person_model.dart';
 import 'expenses_model.dart';
 import 'aid_model.dart';
 
-class CaseModel extends CaseEntity {
+class CaseModel extends Equatable {
+  final String id;
+  final PersonModel applicant;
+  final PersonModel? spouse;
+  final String caseDescription;
+  final List<PersonModel> familyMembers;
+  final int rationCardCount;
+  final int pensionCount;
+  final ExpensesModel expenses;
+  final List<AidModel> aidHistory;
+  final DateTime createdAt;
+
   const CaseModel({
-    required super.id,
-    required super.applicant,
-    super.spouse,
-    required super.caseDescription,
-    required super.familyMembers,
-    required super.rationCardCount,
-    required super.pensionCount,
-    required super.expenses,
-    required super.aidHistory,
-    required super.createdAt,
+    required this.id,
+    required this.applicant,
+    this.spouse,
+    required this.caseDescription,
+    required this.familyMembers,
+    required this.rationCardCount,
+    required this.pensionCount,
+    required this.expenses,
+    required this.aidHistory,
+    required this.createdAt,
   });
+
+  double get totalFamilyIncome {
+    double total = applicant.income;
+    if (spouse != null) {
+      total += spouse!.income;
+    }
+    for (var member in familyMembers) {
+      total += member.income;
+    }
+    return total;
+  }
 
   factory CaseModel.fromJson(Map<String, dynamic> json, String id) {
     return CaseModel(
       id: id,
       applicant: PersonModel.fromJson(json['applicant']),
-      spouse: json['spouse'] != null ? PersonModel.fromJson(json['spouse']) : null,
+      spouse: json['spouse'] != null
+          ? PersonModel.fromJson(json['spouse'])
+          : null,
       caseDescription: json['caseDescription'] ?? '',
-      familyMembers: (json['familyMembers'] as List<dynamic>?)
+      familyMembers:
+          (json['familyMembers'] as List<dynamic>?)
               ?.map((e) => PersonModel.fromJson(e))
               .toList() ??
           [],
       rationCardCount: json['rationCardCount'] ?? 0,
       pensionCount: json['pensionCount'] ?? 0,
       expenses: ExpensesModel.fromJson(json['expenses'] ?? {}),
-      aidHistory: (json['aidHistory'] as List<dynamic>?)
+      aidHistory:
+          (json['aidHistory'] as List<dynamic>?)
               ?.map((e) => AidModel.fromJson(e))
               .toList() ??
           [],
@@ -41,34 +66,29 @@ class CaseModel extends CaseEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'applicant': PersonModel.fromEntity(applicant).toJson(),
-      'spouse': spouse != null ? PersonModel.fromEntity(spouse!).toJson() : null,
+      'applicant': applicant.toJson(),
+      'spouse': spouse?.toJson(),
       'caseDescription': caseDescription,
-      'familyMembers': familyMembers
-          .map((e) => PersonModel.fromEntity(e).toJson())
-          .toList(),
+      'familyMembers': familyMembers.map((e) => e.toJson()).toList(),
       'rationCardCount': rationCardCount,
       'pensionCount': pensionCount,
-      'expenses': ExpensesModel.fromEntity(expenses).toJson(),
-      'aidHistory': aidHistory
-          .map((e) => AidModel.fromEntity(e).toJson())
-          .toList(),
+      'expenses': expenses.toJson(),
+      'aidHistory': aidHistory.map((e) => e.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
     };
   }
 
-  factory CaseModel.fromEntity(CaseEntity entity) {
-    return CaseModel(
-      id: entity.id,
-      applicant: entity.applicant,
-      spouse: entity.spouse,
-      caseDescription: entity.caseDescription,
-      familyMembers: entity.familyMembers,
-      rationCardCount: entity.rationCardCount,
-      pensionCount: entity.pensionCount,
-      expenses: entity.expenses,
-      aidHistory: entity.aidHistory,
-      createdAt: entity.createdAt,
-    );
-  }
+  @override
+  List<Object?> get props => [
+    id,
+    applicant,
+    spouse,
+    caseDescription,
+    familyMembers,
+    rationCardCount,
+    pensionCount,
+    expenses,
+    aidHistory,
+    createdAt,
+  ];
 }

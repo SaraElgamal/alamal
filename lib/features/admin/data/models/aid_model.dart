@@ -1,11 +1,13 @@
-import '../../domain/entities/aid_entity.dart';
+import 'package:equatable/equatable.dart';
 
-class AidModel extends AidEntity {
-  const AidModel({
-    required super.type,
-    required super.value,
-    required super.date,
-  });
+enum AidType { cash, food, medical, educational, other }
+
+class AidModel extends Equatable {
+  final AidType type;
+  final double value;
+  final DateTime date;
+
+  const AidModel({required this.type, required this.value, required this.date});
 
   factory AidModel.fromJson(Map<String, dynamic> json) {
     return AidModel(
@@ -26,11 +28,6 @@ class AidModel extends AidEntity {
     };
   }
 
-  factory AidModel.fromEntity(AidEntity entity) {
-    return AidModel(
-      type: entity.type,
-      value: entity.value,
-      date: entity.date,
-    );
-  }
+  @override
+  List<Object?> get props => [type, value, date];
 }

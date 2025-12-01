@@ -1,82 +1,84 @@
 import 'package:bloc/bloc.dart';
-import '../../domain/entities/case_entity.dart';
-import '../../domain/usecases/add_case_usecase.dart';
-import '../../domain/usecases/export_cases_to_excel_usecase.dart';
-import '../../domain/usecases/get_case_by_id_usecase.dart';
-import '../../domain/usecases/get_cases_usecase.dart';
+import '../../data/models/case_model.dart';
+import '../../data/repo/cases_repository.dart';
 import 'user_cases_state.dart';
 
 class UserCasesCubit extends Cubit<UserCasesState> {
-  final AddCaseUseCase addCase;
-  final GetCasesUseCase getCases;
-  final GetCaseByIdUseCase getCaseById;
-  final ExportCasesToExcelUseCase exportCases;
+  final CasesRepository casesRepository;
 
-  UserCasesCubit({
-    required this.addCase,
-    required this.getCases,
-    required this.getCaseById,
-    required this.exportCases,
-  }) : super(const UserCasesState());
+  UserCasesCubit({required this.casesRepository})
+    : super(const UserCasesState());
 
   Future<void> loadCases() async {
     emit(state.copyWith(status: UserCasesStatus.loading));
-    final result = await getCases();
+    final result = await casesRepository.getCases();
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: UserCasesStatus.error,
-        errorMessage: failure.message,
-      )),
-      (cases) => emit(state.copyWith(
-        status: UserCasesStatus.success,
-        cases: cases,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: UserCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (cases) =>
+          emit(state.copyWith(status: UserCasesStatus.success, cases: cases)),
     );
   }
 
-  Future<void> addNewCase(UserCaseEntity caseEntity) async {
+  Future<void> addNewCase(CaseModel caseModel) async {
     emit(state.copyWith(status: UserCasesStatus.loading));
-    final result = await addCase(caseEntity);
+    final result = await casesRepository.addCase(caseModel);
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: UserCasesStatus.error,
-        errorMessage: failure.message,
-      )),
-      (_) => emit(state.copyWith(
-        status: UserCasesStatus.caseAdded,
-        successMessage: 'تم تسجيل الحالة بنجاح',
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: UserCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (_) => emit(
+        state.copyWith(
+          status: UserCasesStatus.caseAdded,
+          successMessage: 'تم تسجيل الحالة بنجاح',
+        ),
+      ),
     );
   }
 
   Future<void> getCaseDetails(String id) async {
     emit(state.copyWith(status: UserCasesStatus.loading));
-    final result = await getCaseById(id);
+    final result = await casesRepository.getCaseById(id);
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: UserCasesStatus.error,
-        errorMessage: failure.message,
-      )),
-      (caseEntity) => emit(state.copyWith(
-        status: UserCasesStatus.success,
-        selectedCase: caseEntity,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: UserCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (caseModel) => emit(
+        state.copyWith(
+          status: UserCasesStatus.success,
+          selectedCase: caseModel,
+        ),
+      ),
     );
   }
 
   Future<void> exportToExcel() async {
     emit(state.copyWith(status: UserCasesStatus.loading));
-    final result = await exportCases();
+    final result = await casesRepository.exportCasesToExcel();
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: UserCasesStatus.error,
-        errorMessage: failure.message,
-      )),
-      (path) => emit(state.copyWith(
-        status: UserCasesStatus.excelExported,
-        excelPath: path,
-        successMessage: 'تم تصدير البيانات إلى Excel بنجاح',
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: UserCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (path) => emit(
+        state.copyWith(
+          status: UserCasesStatus.excelExported,
+          excelPath: path,
+          successMessage: 'تم تصدير البيانات إلى Excel بنجاح',
+        ),
+      ),
     );
   }
 }

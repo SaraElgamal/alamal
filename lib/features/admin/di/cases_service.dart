@@ -7,6 +7,7 @@ abstract class CasesService {
   Future<CaseModel> getCaseById(String id);
   Future<void> deleteCase(String id);
   Future<void> deleteAllCases();
+  Future<void> updateCase(CaseModel caseModel);
 }
 
 class CasesServiceImpl implements CasesService {
@@ -106,5 +107,16 @@ class CasesServiceImpl implements CasesService {
       batch.delete(doc.reference);
     }
     await batch.commit();
+  }
+
+  @override
+  Future<void> updateCase(CaseModel caseModel) async {
+    if (caseModel.id.isEmpty) {
+      throw Exception('Case ID cannot be empty for update');
+    }
+    await firestore
+        .collection('registrationDataForUsers')
+        .doc(caseModel.id)
+        .update(caseModel.toJson());
   }
 }

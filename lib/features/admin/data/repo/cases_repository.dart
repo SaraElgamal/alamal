@@ -12,4 +12,5 @@ abstract class CasesRepository {
   Future<Either<Failure, String>> exportCasesToExcel();
   Future<Either<Failure, void>> deleteCase(String id);
   Future<Either<Failure, void>> deleteAllCases();
+  Future<Either<Failure, void>> updateCase(CaseModel caseModel);
 }

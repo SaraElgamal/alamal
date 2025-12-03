@@ -9,7 +9,10 @@ class AppRoutes {
   static const String adminDashboard = '/admin-dashboard';
   static const String caseRegistration = '/case-registration';
   static const String caseDetails = '/case-details';
+  static const String editCase = '/edit-case';
   static const String profile = '/profile';
+  static const String changePassword = '/change-password';
+  static const String biometricSetup = '/biometric-setup';
 
   // Feature-specific Routes
 

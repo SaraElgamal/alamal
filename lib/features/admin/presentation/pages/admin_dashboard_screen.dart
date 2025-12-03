@@ -7,9 +7,11 @@ import 'package:charity_app/core/widgets/custom_app_header.dart';
 import 'package:charity_app/core/widgets/custom_dialog.dart';
 import 'package:charity_app/core/widgets/custom_messages.dart';
 import 'package:charity_app/core/widgets/custom_status_widget.dart';
+import 'package:charity_app/core/widgets/custom_loading.dart';
 import 'package:charity_app/core/widgets/empty_widget.dart';
 import 'package:charity_app/core/widgets/text_form_filed_widget.dart';
 import 'package:charity_app/features/admin/presentation/cubit/admin_cases_cubit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -129,7 +131,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     builder: (context, state) {
                       if (state.status == AdminCasesStatus.loading &&
                           state.cases.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
+                        return CustomLoading.showLoadingView(context);
                       }
 
                       final displayCases = state.isFiltering
@@ -149,10 +151,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             displayCases.length + (state.isLoadingMore ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index >= displayCases.length) {
-                            return const Center(
+                            return Center(
                               child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(),
+                                padding: const EdgeInsets.all(8.0),
+                                child: CustomLoading.showDotLoader(),
                               ),
                             );
                           }
@@ -172,13 +174,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _buildDrawer(BuildContext context) {
+    final user = di.sl<FirebaseAuth>().currentUser;
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: const Text('Admin User'),
-            accountEmail: const Text('admin@charity.com'),
+            accountName: Text(user?.displayName ?? 'Admin User'),
+            accountEmail: Text(user?.email ?? 'admin@charity.com'),
             currentAccountPicture: const CircleAvatar(
               backgroundColor: Colors.white,
               child: Icon(Icons.person, size: 40),
@@ -281,7 +284,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           onTap: () {
             context.push(
               AppRoutes.caseDetails,
-              extra: _mapToUserCaseModel(caseItem),
+              extra: {'case': _mapToUserCaseModel(caseItem), 'showEdit': true},
             );
           },
           child: Column(

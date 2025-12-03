@@ -2,6 +2,7 @@ import 'package:charity_app/core/config/res/app_sizes.dart';
 import 'package:charity_app/core/config/res/assets.gen.dart';
 import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:charity_app/core/widgets/buttons/default_button.dart';
+import 'package:charity_app/core/widgets/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -64,11 +65,7 @@ class AlertBottomSheetWidget extends StatelessWidget {
           // if (body != null) body!,
           Flexible(
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  if (body != null) body!,
-                ],
-              ),
+              child: Column(children: [if (body != null) body!]),
             ),
           ),
           SizedBox(height: 24.h),
@@ -84,15 +81,16 @@ class AlertBottomSheetWidget extends StatelessWidget {
                     textColor: confirmTextColor,
                     fontSize: FontSize.s16,
                     fontWeight: FontWeightManager.regular,
-                    customChild: customChild ??
+                    customChild:
+                        customChild ??
                         ((isLoading)
                             ? SizedBox(
                                 width: 25,
                                 height: 25,
                                 child: Center(
-                                  child: CircularProgressIndicator(
+                                  child: CustomLoading.showDotLoader(
                                     color: context.colors.white,
-                                    strokeWidth: 2,
+                                    size: 25,
                                   ),
                                 ),
                               )
@@ -108,7 +106,9 @@ class AlertBottomSheetWidget extends StatelessWidget {
                     color: context.colors.whiteF4F5F6,
                     borderColor: context.colors.transparent,
                     textColor: context.colors.cancelButtonInSavedAddresses,
-                    fontFamily: Theme.of(context).textTheme.headlineLarge?.fontFamily,
+                    fontFamily: Theme.of(
+                      context,
+                    ).textTheme.headlineLarge?.fontFamily,
                     fontSize: FontSize.s16,
                     fontWeight: FontWeightManager.regular,
                     margin: EdgeInsets.zero,

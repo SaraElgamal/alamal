@@ -10,6 +10,9 @@ import 'package:charity_app/features/user/data/models/case_model.dart';
 import 'package:charity_app/features/user/presentation/pages/case_details_screen.dart';
 import 'package:charity_app/features/admin/presentation/pages/profile_screen.dart';
 import 'package:charity_app/features/user/presentation/pages/case_registration_screen.dart';
+import 'package:charity_app/features/admin/presentation/pages/edit_case_screen.dart';
+import 'package:charity_app/features/start_screens/presentation/pages/biometric_setup_screen.dart';
+import 'package:charity_app/features/admin/presentation/pages/change_password_screen.dart';
 import '../navigation.dart';
 
 class AppRouter {
@@ -58,11 +61,28 @@ class AppRouter {
         path: AppRoutes.caseDetails,
         name: 'caseDetails',
         pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final caseEntity = extra['case'] as CaseModel;
+          final showEditAction = extra['showEdit'] as bool? ?? false;
+          return AppTransitions.slideFromRight(
+            context: context,
+            state: state,
+            child: CaseDetailsScreen(
+              caseEntity: caseEntity,
+              showEditAction: showEditAction,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.editCase,
+        name: 'editCase',
+        pageBuilder: (context, state) {
           final caseEntity = state.extra as CaseModel;
           return AppTransitions.slideFromRight(
             context: context,
             state: state,
-            child: CaseDetailsScreen(caseEntity: caseEntity),
+            child: EditCaseScreen(caseModel: caseEntity),
           );
         },
       ),
@@ -74,6 +94,30 @@ class AppRouter {
           state: state,
           child: const ProfileScreen(),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.changePassword,
+        name: 'changePassword',
+        pageBuilder: (context, state) => AppTransitions.slideFromRight(
+          context: context,
+          state: state,
+          child: const ChangePasswordScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.biometricSetup,
+        name: 'biometricSetup',
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, String>;
+          return AppTransitions.slideFromRight(
+            context: context,
+            state: state,
+            child: BiometricSetupScreen(
+              email: extra['email']!,
+              password: extra['password']!,
+            ),
+          );
+        },
       ),
     ],
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:charity_app/core/helpers/context_extension.dart';
+import 'package:charity_app/core/widgets/custom_loading.dart';
 
 class ButtonLoadingWidget extends StatelessWidget {
   const ButtonLoadingWidget({super.key, this.color});
@@ -10,9 +11,9 @@ class ButtonLoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return FittedBox(
       child: Center(
-        child: CircularProgressIndicator(
+        child: CustomLoading.showDotLoader(
           color: color ?? context.colors.white,
-          strokeWidth: 2,
+          size: 25,
         ),
       ),
     );

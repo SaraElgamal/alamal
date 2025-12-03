@@ -117,6 +117,36 @@ class AdminCasesCubit extends Cubit<AdminCasesState> {
     );
   }
 
+  Future<void> updateCase(CaseModel caseModel) async {
+    emit(state.copyWith(status: AdminCasesStatus.loading));
+    final result = await casesRepository.updateCase(caseModel);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (_) {
+        // Update the specific case in the list to avoid full reload if possible,
+        // or just reload. Reloading is safer for consistency.
+        // But let's try to update locally for better UX.
+        final updatedCases = state.cases.map((c) {
+          return c.id == caseModel.id ? caseModel : c;
+        }).toList();
+
+        emit(
+          state.copyWith(
+            status: AdminCasesStatus.success,
+            cases: updatedCases,
+            successMessage: 'Case updated successfully',
+          ),
+        );
+        _applyFilters();
+      },
+    );
+  }
+
   Future<void> exportToExcel() async {
     emit(state.copyWith(status: AdminCasesStatus.loading));
     final result = await casesRepository.exportCasesToExcel();

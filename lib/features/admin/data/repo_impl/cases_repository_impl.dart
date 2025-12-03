@@ -132,4 +132,14 @@ class CasesRepositoryImpl implements CasesRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> updateCase(CaseModel caseModel) async {
+    try {
+      await casesService.updateCase(caseModel);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

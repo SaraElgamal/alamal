@@ -1,11 +1,14 @@
 import 'package:charity_app/core/config/res/app_sizes.dart';
 import 'package:charity_app/core/helpers/context_extension.dart';
+import 'package:charity_app/core/navigation/routes/app_routes.dart';
 import 'package:charity_app/core/widgets/custom_app_header.dart';
 import 'package:charity_app/core/widgets/custom_messages.dart';
+import 'package:charity_app/core/widgets/buttons/loading_button.dart';
 import 'package:charity_app/core/widgets/text_form_filed_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,40 +18,38 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
   final _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
-    _emailController.text = _auth.currentUser?.email ?? '';
+    final user = _auth.currentUser;
+    _nameController.text = user?.displayName ?? '';
+    _emailController.text = user?.email ?? '';
   }
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _updateProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
     try {
       final user = _auth.currentUser;
       if (user == null) return;
 
-      if (_emailController.text == user.email &&
-          _passwordController.text.isEmpty) {
-        if (mounted) {
-          MessageUtils.showSuccess('لم يتم إجراء أي تغييرات', context: context);
-          setState(() => _isLoading = false);
-        }
-        return;
+      bool hasChanges = false;
+
+      if (_nameController.text != user.displayName) {
+        await user.updateDisplayName(_nameController.text);
+        hasChanges = true;
       }
 
       if (_emailController.text != user.email) {
@@ -59,15 +60,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             context: context,
           );
         }
+        hasChanges = true;
       }
 
-      if (_passwordController.text.isNotEmpty) {
-        await user.updatePassword(_passwordController.text);
-        if (mounted) {
-          MessageUtils.showSuccess(
-            'تم تحديث كلمة المرور بنجاح',
-            context: context,
-          );
+      if (mounted) {
+        if (hasChanges) {
+          MessageUtils.showSuccess('تم تحديث البيانات بنجاح', context: context);
+        } else {
+          MessageUtils.showSuccess('لم يتم إجراء أي تغييرات', context: context);
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -77,18 +77,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           message = 'يرجى تسجيل الدخول مرة أخرى للمتابعة';
         } else if (e.code == 'email-already-in-use') {
           message = 'البريد الإلكتروني مستخدم بالفعل';
-        } else if (e.code == 'weak-password') {
-          message = 'كلمة المرور ضعيفة';
         }
         MessageUtils.showError(message, context: context);
       }
     } catch (e) {
       if (mounted) {
         MessageUtils.showError('حدث خطأ غير متوقع', context: context);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
       }
     }
   }
@@ -108,6 +102,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     SizedBox(height: 20.h),
                     TextFormFieldWidget(
+                      controller: _nameController,
+                      label: 'الاسم',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'مطلوب';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 16.h),
+                    TextFormFieldWidget(
                       controller: _emailController,
                       label: 'البريد الإلكتروني',
                       prefixIcon: const Icon(Icons.email_outlined),
@@ -122,47 +128,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16.h),
-                    TextFormFieldWidget(
-                      controller: _passwordController,
-                      label: 'كلمة المرور الجديدة',
-                      subLabel: 'اتركها فارغة إذا لم ترد تغييرها',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      isPassword: true,
-                      validator: (value) {
-                        if (value != null &&
-                            value.isNotEmpty &&
-                            value.length < 6) {
-                          return 'يجب أن تكون 6 أحرف على الأقل';
-                        }
-                        return null;
+                    SizedBox(height: 24.h),
+                    OutlinedButton(
+                      onPressed: () {
+                        context.push(AppRoutes.changePassword);
                       },
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        side: BorderSide(color: context.colors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.lock_outline,
+                            color: context.colors.primary,
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            'تغيير كلمة المرور',
+                            style: TextStyle(
+                              color: context.colors.primary,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     SizedBox(height: 40.h),
-                    SizedBox(
-                      width: double.infinity,
+                    LoadingButton(
+                      title: 'حفظ التغييرات',
+                      onTap: _updateProfile,
+                      color: context.colors.primary,
+                      textColor: Colors.white,
+                      borderRadius: 12.r,
                       height: 50.h,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _updateProfile,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: context.colors.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
-                        child: _isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : Text(
-                                'حفظ التغييرات',
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
                     ),
                   ],
                 ),

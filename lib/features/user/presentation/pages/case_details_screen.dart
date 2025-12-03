@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:charity_app/core/helpers/url_launcher_helper.dart';
 import '../../data/models/case_model.dart';
+import '../../../../core/navigation/routes/app_routes.dart';
 
 class CaseDetailsScreen extends StatelessWidget {
   final CaseModel caseEntity;
+  final bool showEditAction;
 
-  const CaseDetailsScreen({super.key, required this.caseEntity});
+  const CaseDetailsScreen({
+    super.key,
+    required this.caseEntity,
+    this.showEditAction = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +23,15 @@ class CaseDetailsScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          if (showEditAction)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                context.push(AppRoutes.editCase, extra: caseEntity);
+              },
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

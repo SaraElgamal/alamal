@@ -9,7 +9,6 @@ import 'package:charity_app/core/config/res/color_manager.dart';
 import 'package:charity_app/core/config/res/constants_manager.dart';
 import 'package:charity_app/core/helpers/context_extension.dart';
 
-
 class MessageUtils {
   static OverlayEntry? _currentOverlay;
 
@@ -30,21 +29,27 @@ class MessageUtils {
   }
 
   static void showSuccess(String message, {BuildContext? context}) {
+    final targetContext = context ?? NavigationService.currentContext;
+    if (targetContext == null) return;
+
     _showTopNotice(
       message,
-      context: context,
-      backgroundColor: NavigationService.currentContext!.colors.successECFDF3,
-      foregroundColor: NavigationService.currentContext!.colors.success60,
+      context: targetContext,
+      backgroundColor: targetContext.colors.successECFDF3,
+      foregroundColor: targetContext.colors.success60,
       iconData: Icons.check,
     );
   }
 
   static void showError(String message, {BuildContext? context}) {
+    final targetContext = context ?? NavigationService.currentContext;
+    if (targetContext == null) return;
+
     _showTopNotice(
       message,
-      context: context,
-      backgroundColor: NavigationService.currentContext!.colors.toastBackGroundError,
-      foregroundColor: NavigationService.currentContext!.colors.toastError,
+      context: targetContext,
+      backgroundColor: targetContext.colors.toastBackGroundError,
+      foregroundColor: targetContext.colors.toastError,
       iconData: Icons.priority_high_rounded,
     );
   }
@@ -58,12 +63,21 @@ class MessageUtils {
     BuildContext? context,
     VoidCallback? onTap,
   }) {
-    final targetContext = context ?? NavigationService.navigatorKey.currentContext;
-    if (targetContext == null) return;
+    final targetContext =
+        context ?? NavigationService.navigatorKey.currentContext;
+    if (targetContext == null) {
+      debugPrint('MessageUtils: targetContext is null');
+      return;
+    }
 
-    final overlayState = Overlay.maybeOf(targetContext, rootOverlay: true) ??
+    final overlayState =
+        Overlay.maybeOf(targetContext, rootOverlay: true) ??
         NavigationService.navigatorKey.currentState?.overlay;
+
     if (overlayState == null) {
+      debugPrint(
+        'MessageUtils: overlayState is null, falling back to SnackBar',
+      );
       showSnackBar(
         message,
         backgroundColor: backgroundColor,
@@ -114,16 +128,19 @@ class MessageUtils {
           fontFamily: ConstantManager.fontFamily,
         ),
       ),
-      backgroundColor: backgroundColor ?? NavigationService.currentContext!.colors.white,
+      backgroundColor:
+          backgroundColor ?? NavigationService.currentContext!.colors.white,
       behavior: SnackBarBehavior.floating,
       showCloseIcon: true,
-      closeIconColor: textColor ?? NavigationService.currentContext!.colors.error,
+      closeIconColor:
+          textColor ?? NavigationService.currentContext!.colors.error,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.bR4),
       ),
     );
-    ScaffoldMessenger.of(context ?? NavigationService.navigatorKey.currentContext!)
-        .showSnackBar(snackBar);
+    ScaffoldMessenger.of(
+      context ?? NavigationService.navigatorKey.currentContext!,
+    ).showSnackBar(snackBar);
   }
 
   static void showSimpleToast({
@@ -143,10 +160,7 @@ class MessageUtils {
     );
   }
 
-  static void showErrorToast({
-    required String msg,
-    ToastGravity? gravity,
-  }) {
+  static void showErrorToast({required String msg, ToastGravity? gravity}) {
     Fluttertoast.showToast(
       msg: msg,
       toastLength: Toast.LENGTH_LONG,
@@ -154,14 +168,12 @@ class MessageUtils {
       timeInSecForIosWeb: 1,
       textColor: AppColors.error,
       fontSize: 16.sp,
-      backgroundColor: NavigationService.navigatorKey.currentContext!.colors.error,
+      backgroundColor:
+          NavigationService.navigatorKey.currentContext!.colors.error,
     );
   }
 
-  static void showSuccessToast({
-    required String msg,
-    ToastGravity? gravity,
-  }) {
+  static void showSuccessToast({required String msg, ToastGravity? gravity}) {
     Fluttertoast.showToast(
       msg: msg,
       toastLength: Toast.LENGTH_LONG,
@@ -169,7 +181,8 @@ class MessageUtils {
       timeInSecForIosWeb: 1,
       textColor: AppColors.success60,
       fontSize: 16.sp,
-      backgroundColor: NavigationService.navigatorKey.currentContext!.colors.success,
+      backgroundColor:
+          NavigationService.navigatorKey.currentContext!.colors.success,
     );
   }
 }
@@ -197,7 +210,8 @@ class _TopNoticeOverlay extends StatefulWidget {
   State<_TopNoticeOverlay> createState() => _TopNoticeOverlayState();
 }
 
-class _TopNoticeOverlayState extends State<_TopNoticeOverlay> with SingleTickerProviderStateMixin {
+class _TopNoticeOverlayState extends State<_TopNoticeOverlay>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   Timer? _hideTimer;
 
@@ -244,14 +258,17 @@ class _TopNoticeOverlayState extends State<_TopNoticeOverlay> with SingleTickerP
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
-              final offset = Tween<Offset>(
-                begin: const Offset(0, -0.3),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: _controller,
-                curve: Curves.easeOutCubic,
-                reverseCurve: Curves.easeInCubic,
-              ));
+              final offset =
+                  Tween<Offset>(
+                    begin: const Offset(0, -0.3),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: _controller,
+                      curve: Curves.easeOutCubic,
+                      reverseCurve: Curves.easeInCubic,
+                    ),
+                  );
 
               final opacity = CurvedAnimation(
                 parent: _controller,
@@ -264,7 +281,10 @@ class _TopNoticeOverlayState extends State<_TopNoticeOverlay> with SingleTickerP
                 child: Opacity(
                   opacity: opacity.value,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 12.h,
+                    ),
                     child: GestureDetector(
                       onTap: () {
                         widget.onTap?.call();
@@ -275,7 +295,10 @@ class _TopNoticeOverlayState extends State<_TopNoticeOverlay> with SingleTickerP
                         borderRadius: BorderRadius.circular(AppRadius.bR12),
                         color: widget.backgroundColor,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 14.h,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(AppRadius.bR12),
                           ),
@@ -295,7 +318,7 @@ class _TopNoticeOverlayState extends State<_TopNoticeOverlay> with SingleTickerP
                                   size: 16.sp,
                                 ),
                               ),
-                             // AppSize.sW12.szW,
+                              // AppSize.sW12.szW,
                               Expanded(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -311,14 +334,16 @@ class _TopNoticeOverlayState extends State<_TopNoticeOverlay> with SingleTickerP
                                       ),
                                     ),
                                     if (widget.body != null) ...[
-                                    //   AppSize.sH4.szH,
+                                      //   AppSize.sH4.szH,
                                       Text(
                                         widget.body!,
                                         style: TextStyle(
-                                          color: widget.foregroundColor.withOpacity(0.9),
+                                          color: widget.foregroundColor
+                                              .withOpacity(0.9),
                                           fontSize: FontSize.s12,
                                           fontWeight: FontWeight.w400,
-                                          fontFamily: ConstantManager.fontFamily,
+                                          fontFamily:
+                                              ConstantManager.fontFamily,
                                         ),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,

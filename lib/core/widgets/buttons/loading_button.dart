@@ -1,7 +1,7 @@
 import 'package:charity_app/core/config/res/app_sizes.dart';
 import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:charity_app/core/widgets/custom_loading.dart';
 import 'custom_animated_button.dart';
 
 class LoadingButton extends StatelessWidget {
@@ -39,7 +39,8 @@ class LoadingButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: margin ??
+      padding:
+          margin ??
           EdgeInsets.symmetric(
             horizontal: AppMargin.mW10,
             vertical: AppMargin.mH10,
@@ -53,11 +54,12 @@ class LoadingButton extends StatelessWidget {
         borderRadius: borderRadius ?? AppSize.sH10,
         disabledColor: color ?? context.colors.primary5,
         borderSide: borderSide,
-        loader: SpinKitFadingCircle(
+        loader: CustomLoading.showDotLoader(
           color: context.colors.white,
           size: AppSize.sH50,
         ),
-        child: customChild ??
+        child:
+            customChild ??
             Text(
               title,
               style: TextStyle(

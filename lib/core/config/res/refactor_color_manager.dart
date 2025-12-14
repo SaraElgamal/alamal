@@ -176,7 +176,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     return AppColorsExtension(
       primary: primary ?? this.primary,
       red50: red50 ?? this.red50,
-      primaryLightPrimarydark: primaryLightPrimarydark ?? this.primaryLightPrimarydark,
+      primaryLightPrimarydark:
+          primaryLightPrimarydark ?? this.primaryLightPrimarydark,
       primary5: primary5 ?? this.primary5,
       secondary: secondary ?? this.secondary,
       background: background ?? this.background,
@@ -188,7 +189,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       successECFDF3: successECFDF3 ?? this.successECFDF3,
       success60: success60 ?? this.success60,
       disabled: disabled ?? this.disabled,
-      disabledTextFeiledColor: disabledTextFeiledColor ?? this.disabledTextFeiledColor,
+      disabledTextFeiledColor:
+          disabledTextFeiledColor ?? this.disabledTextFeiledColor,
       card: card ?? this.card,
       cardPrimary: cardPrimary ?? this.cardPrimary,
       border: border ?? this.border,
@@ -200,9 +202,9 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       cancelButtonInSavedAddresses:
           cancelButtonInSavedAddresses ?? this.cancelButtonInSavedAddresses,
       addAddressCard: addAddressCard ?? this.addAddressCard,
-      lightPrimaryDarkWhite: iconDefaultAddress ?? this.lightPrimaryDarkWhite,
-      lightcardDarkWhite: cardDefaultAddress ?? this.lightcardDarkWhite,
-      lightWhiteDarkPrimary: textInverse ?? this.lightWhiteDarkPrimary,
+      lightPrimaryDarkWhite: iconDefaultAddress ?? lightPrimaryDarkWhite,
+      lightcardDarkWhite: cardDefaultAddress ?? lightcardDarkWhite,
+      lightWhiteDarkPrimary: textInverse ?? lightWhiteDarkPrimary,
       textSubtle: textSubtle ?? this.textSubtle,
       textDisabled: textDisabled ?? this.textDisabled,
       transparent: transparent ?? this.transparent,
@@ -240,19 +242,30 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       primary: Color.lerp(primary, other.primary, t)!,
       primary5: Color.lerp(primary5, other.primary5, t)!,
       secondary: Color.lerp(secondary, other.secondary, t)!,
-      primaryLightPrimarydark: Color.lerp(primaryLightPrimarydark, other.primaryLightPrimarydark, t)!,
-       red50: Color.lerp(red50, other.red50, t)!,
+      primaryLightPrimarydark: Color.lerp(
+        primaryLightPrimarydark,
+        other.primaryLightPrimarydark,
+        t,
+      )!,
+      red50: Color.lerp(red50, other.red50, t)!,
       background: Color.lerp(background, other.background, t)!,
       error: Color.lerp(error, other.error, t)!,
       success: Color.lerp(success, other.success, t)!,
-      scaffoldBackground: Color.lerp(scaffoldBackground, other.scaffoldBackground, t)!,
+      scaffoldBackground: Color.lerp(
+        scaffoldBackground,
+        other.scaffoldBackground,
+        t,
+      )!,
       text: Color.lerp(text, other.text, t)!,
       error10: Color.lerp(error10, other.error10, t)!,
       successECFDF3: Color.lerp(successECFDF3, other.successECFDF3, t)!,
       success60: Color.lerp(success60, other.success60, t)!,
       disabled: Color.lerp(disabled, other.disabled, t)!,
-      disabledTextFeiledColor:
-          Color.lerp(disabledTextFeiledColor, other.disabledTextFeiledColor, t)!,
+      disabledTextFeiledColor: Color.lerp(
+        disabledTextFeiledColor,
+        other.disabledTextFeiledColor,
+        t,
+      )!,
       card: Color.lerp(card, other.card, t)!,
       cardPrimary: Color.lerp(cardPrimary, other.cardPrimary, t)!,
       border: Color.lerp(border, other.border, t)!,
@@ -261,12 +274,27 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       textFieldBorder: Color.lerp(textFieldBorder, other.textFieldBorder, t)!,
       whiteBtn: Color.lerp(whiteBtn, other.whiteBtn, t)!,
       deleteButton: Color.lerp(deleteButton, other.deleteButton, t)!,
-      cancelButtonInSavedAddresses:
-          Color.lerp(cancelButtonInSavedAddresses, other.cancelButtonInSavedAddresses, t)!,
+      cancelButtonInSavedAddresses: Color.lerp(
+        cancelButtonInSavedAddresses,
+        other.cancelButtonInSavedAddresses,
+        t,
+      )!,
       addAddressCard: Color.lerp(addAddressCard, other.addAddressCard, t)!,
-      lightPrimaryDarkWhite: Color.lerp(lightPrimaryDarkWhite, other.lightPrimaryDarkWhite, t)!,
-      lightcardDarkWhite: Color.lerp(lightcardDarkWhite, other.lightcardDarkWhite, t)!,
-      lightWhiteDarkPrimary: Color.lerp(lightWhiteDarkPrimary, other.lightWhiteDarkPrimary, t)!,
+      lightPrimaryDarkWhite: Color.lerp(
+        lightPrimaryDarkWhite,
+        other.lightPrimaryDarkWhite,
+        t,
+      )!,
+      lightcardDarkWhite: Color.lerp(
+        lightcardDarkWhite,
+        other.lightcardDarkWhite,
+        t,
+      )!,
+      lightWhiteDarkPrimary: Color.lerp(
+        lightWhiteDarkPrimary,
+        other.lightWhiteDarkPrimary,
+        t,
+      )!,
       textSubtle: Color.lerp(textSubtle, other.textSubtle, t)!,
       textDisabled: Color.lerp(textDisabled, other.textDisabled, t)!,
       transparent: Color.lerp(transparent, other.transparent, t)!,
@@ -276,7 +304,11 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       grey: Color.lerp(grey, other.grey, t)!,
       amber: Color.lerp(amber, other.amber, t)!,
       red: Color.lerp(red, other.red, t)!,
-      actionSecondaryColor: Color.lerp(actionSecondaryColor, other.actionSecondaryColor, t)!,
+      actionSecondaryColor: Color.lerp(
+        actionSecondaryColor,
+        other.actionSecondaryColor,
+        t,
+      )!,
       black100: Color.lerp(black100, other.black100, t)!,
       black90: Color.lerp(black90, other.black90, t)!,
       black80: Color.lerp(black80, other.black80, t)!,
@@ -291,15 +323,19 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       black1: Color.lerp(black1, other.black1, t)!,
       toastSuccess: Color.lerp(toastSuccess, other.toastSuccess, t)!,
       toastError: Color.lerp(toastError, other.toastError, t)!,
-      toastBackGroundError: Color.lerp(toastBackGroundError, other.toastBackGroundError, t)!,
+      toastBackGroundError: Color.lerp(
+        toastBackGroundError,
+        other.toastBackGroundError,
+        t,
+      )!,
     );
   }
 }
 
 const AppColorsExtension lightColors = AppColorsExtension(
-  primary: AppColors.primary,
-  primary5: Color(0xff8FB6DB),
-  primaryLightPrimarydark:Color(0xff41A2D9) ,
+  primary: Color(0xff41ab5d),
+  primary5: Color(0xffC9F1D4), // Lighter Green
+  primaryLightPrimarydark: Color(0xff5DBD80), // Darker Green
   scaffoldBackground: AppColors.lightGrey,
   secondary: AppColors.secondary,
   background: AppColors.scaffoldBackground,
@@ -314,7 +350,7 @@ const AppColorsExtension lightColors = AppColorsExtension(
   disabled: AppColors.black30,
   disabledTextFeiledColor: AppColors.disabledTextFeiledColor,
   card: AppColors.card,
-  cardPrimary: Color(0xff41A2D9),
+  cardPrimary: Color(0xff5DBD80), // Darker Green
   border: AppColors.black10,
   divider: AppColors.black5,
   hintText: AppColors.hintText,
@@ -355,7 +391,7 @@ const AppColorsExtension lightColors = AppColorsExtension(
 
 const AppColorsExtension darkColors = AppColorsExtension(
   primary: AppColors.primary,
-  primary5: Color(0xff1F4F79),
+  primary5: Color(0xff2E5C3E), // Dark Green
   secondary: Color(0xffB3CEE7),
   red50: AppColors.red50,
   background: Color(0xff0F172A),
@@ -370,7 +406,7 @@ const AppColorsExtension darkColors = AppColorsExtension(
   disabled: Color(0xff1F2937),
   disabledTextFeiledColor: Color(0xff243047),
   card: Color(0xff1F2937),
-  cardPrimary: Color(0xff1D4C7E),
+  cardPrimary: Color(0xff2E5C3E), // Dark Green
   border: AppColors.transparent,
   //border: Color(0xff2A3547),
   divider: Color(0xff1C2534),

@@ -1,26 +1,45 @@
 import 'package:charity_app/core/navigation/routes/slider_transition.dart';
+import 'package:charity_app/features/admin/presentation/pages/admin_dashboard_screen.dart';
+import 'package:charity_app/features/admin/presentation/pages/change_password_screen.dart';
+import 'package:charity_app/features/admin/presentation/pages/edit_case_screen.dart';
+import 'package:charity_app/features/admin/presentation/pages/profile_screen.dart';
+import 'package:charity_app/features/start_screens/presentation/pages/admin_login_screen.dart';
+import 'package:charity_app/features/start_screens/presentation/pages/biometric_setup_screen.dart';
+import 'package:charity_app/features/start_screens/presentation/pages/landing_screen.dart';
+import 'package:charity_app/features/start_screens/presentation/pages/onboarding_screen.dart';
+import 'package:charity_app/features/start_screens/presentation/pages/splash_screen.dart';
+import 'package:charity_app/features/user/data/models/case_model.dart';
+import 'package:charity_app/features/user/presentation/pages/case_details_screen.dart';
+import 'package:charity_app/features/user/presentation/pages/case_registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:charity_app/core/navigation/routes/app_routes.dart';
-import 'package:charity_app/features/admin/presentation/pages/admin_dashboard_screen.dart';
-import 'package:charity_app/features/start_screens/presentation/pages/admin_login_screen.dart';
-import 'package:charity_app/features/start_screens/presentation/pages/landing_screen.dart';
-import 'package:charity_app/features/user/data/models/case_model.dart';
-import 'package:charity_app/features/user/presentation/pages/case_details_screen.dart';
-import 'package:charity_app/features/admin/presentation/pages/profile_screen.dart';
-import 'package:charity_app/features/user/presentation/pages/case_registration_screen.dart';
-import 'package:charity_app/features/admin/presentation/pages/edit_case_screen.dart';
-import 'package:charity_app/features/start_screens/presentation/pages/biometric_setup_screen.dart';
-import 'package:charity_app/features/admin/presentation/pages/change_password_screen.dart';
 import '../navigation.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: NavigationService.navigatorKey,
-    initialLocation: AppRoutes.landing,
+    initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        name: 'splash',
+        pageBuilder: (context, state) => AppTransitions.slideFromRight(
+          context: context,
+          state: state,
+          child: const SplashScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        name: 'onboarding',
+        pageBuilder: (context, state) => AppTransitions.slideFromRight(
+          context: context,
+          state: state,
+          child: const OnboardingScreen(),
+        ),
+      ),
       GoRoute(
         path: AppRoutes.landing,
         name: 'landing',

@@ -1,7 +1,8 @@
+import 'package:charity_app/core/config/res/refactor_color_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:charity_app/core/config/res/refactor_color_manager.dart';
+import 'package:intl/intl.dart' as intl;
 
 class TextFormFieldWidget extends StatefulWidget {
   const TextFormFieldWidget({
@@ -76,12 +77,39 @@ class TextFormFieldWidget extends StatefulWidget {
 class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
   late FocusNode _focusNode;
   bool _isFocused = false;
+  TextDirection? _textDirection;
 
   @override
   void initState() {
     super.initState();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode.addListener(_handleFocusChange);
+    if (widget.controller != null && widget.controller!.text.isNotEmpty) {
+      _updateTextDirection(widget.controller!.text);
+    }
+  }
+
+  void _updateTextDirection(String text) {
+    if (widget.keyboardType == TextInputType.phone) {
+      if (_textDirection != TextDirection.ltr) {
+        setState(() => _textDirection = TextDirection.ltr);
+      }
+      return;
+    }
+
+    if (text.isEmpty) {
+      if (_textDirection != null) {
+        setState(() => _textDirection = null);
+      }
+      return;
+    }
+
+    final isRtl = intl.Bidi.detectRtlDirectionality(text);
+    final newDirection = isRtl ? TextDirection.rtl : TextDirection.ltr;
+
+    if (_textDirection != newDirection) {
+      setState(() => _textDirection = newDirection);
+    }
   }
 
   void _handleFocusChange() {
@@ -105,15 +133,12 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<AppColorsExtension>()!;
 
-    final effectiveFillColor = widget.fillColor ??
-        (_isFocused
-            ? colors.primary.withValues(alpha: 0.05)
-            : colors.whiteBtn);
+    final effectiveFillColor =
+        widget.fillColor ??
+        (_isFocused ? colors.primary.withValues(alpha: 0.05) : colors.whiteBtn);
 
-    final effectiveBorderColor = widget.borderColor ??
-        (_isFocused
-            ? colors.primary
-            : colors.border);
+    final effectiveBorderColor =
+        widget.borderColor ?? (_isFocused ? colors.primary : colors.border);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,9 +148,10 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
             children: [
               Text(
                 widget.label!,
-                style: widget.textAboveStyle ??
+                style:
+                    widget.textAboveStyle ??
                     TextStyle(
-                      color: colors.black.withValues(alpha: 0.8),
+                      color: colors.textSubtle,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -149,15 +175,17 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
           ),
           SizedBox(height: widget.labelSpace ?? 8.h),
         ],
-
         TextFormField(
           maxLines: widget.maxLines,
           controller: widget.controller,
           focusNode: _focusNode,
           validator: widget.validator,
+          autovalidateMode:
+              AutovalidateMode.onUserInteraction, // Enable real-time validation
           inputFormatters: widget.inputFormatters,
           cursorColor: colors.primary,
           obscureText: widget.isPassword,
+
           onTapOutside: (event) => FocusScope.of(context).unfocus(),
           style: TextStyle(
             color: colors.text,
@@ -168,37 +196,44 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
           textAlignVertical: TextAlignVertical.center,
           keyboardType: widget.keyboardType,
           onTap: widget.onTap,
-          onChanged: widget.onChanged,
+          onChanged: (value) {
+            _updateTextDirection(value);
+            widget.onChanged?.call(value);
+          },
           readOnly: widget.readOnly,
           onFieldSubmitted: widget.onFieldSubmitted,
           enabled: widget.enabled,
           textInputAction: (widget.keyboardType == TextInputType.phone)
               ? TextInputAction.done
               : widget.textInputAction,
-          textDirection: (widget.keyboardType == TextInputType.phone)
-              ? TextDirection.ltr
-              : Directionality.of(context),
-
+          textDirection:
+              _textDirection ??
+              ((widget.keyboardType == TextInputType.phone)
+                  ? TextDirection.ltr
+                  : Directionality.of(context)),
           decoration: InputDecoration(
             icon: widget.icon,
             filled: true,
             fillColor: effectiveFillColor,
             labelText: !widget.hasTextAbove ? widget.label : null,
-            labelStyle: widget.labelStyle ?? TextStyle(
-              color: _isFocused ? colors.primary : colors.hintText,
-              fontSize: 10.sp,
-              fontWeight: FontWeight.w500,
-            ),
+            labelStyle:
+                widget.labelStyle ??
+                TextStyle(
+                  color: _isFocused ? colors.primary : colors.hintText,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                ),
             floatingLabelBehavior: widget.floatingLabelBehavior,
             hintText: widget.hint,
             hintTextDirection: (widget.keyboardType == TextInputType.phone)
                 ? TextDirection.ltr
                 : Directionality.of(context),
-            hintStyle: widget.hintStyle ??
+            hintStyle:
+                widget.hintStyle ??
                 TextStyle(
                   color: colors.hintText,
                   fontWeight: FontWeight.w500,
-                  fontSize: 10.sp,
+                  fontSize: 14.sp,
                 ),
             errorStyle: TextStyle(
               color: colors.error,
@@ -206,15 +241,24 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
               fontWeight: FontWeight.w500,
             ),
             errorMaxLines: 3,
-            prefixIcon: Padding(padding: EdgeInsetsDirectional.symmetric(horizontal: 10.w , vertical: 12.h ), child: widget.prefixIcon,) ,
-            alignLabelWithHint: widget.alignLabelWithHint,
+            prefixIcon: Padding(
+              padding: EdgeInsetsDirectional.symmetric(
+                horizontal: 10.w,
+                vertical: 12.h,
+              ),
+              child: widget.prefixIcon,
+            ),
+            alignLabelWithHint: true,
             contentPadding: EdgeInsets.symmetric(
               horizontal: 16.w,
               vertical: 16.h,
             ),
             suffixIcon: Padding(
               padding: widget.enableSuffixPadding
-                  ? EdgeInsetsDirectional.symmetric(horizontal: 12.w , vertical: 12.h )
+                  ? EdgeInsetsDirectional.symmetric(
+                      horizontal: 12.w,
+                      vertical: 12.h,
+                    )
                   : EdgeInsets.zero,
               child: widget.suffixIcon,
             ),
@@ -228,7 +272,6 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
             disabledBorder: _buildBorder(color: colors.disabled),
           ),
         ),
-
         if (widget.subLabel != null) ...[
           SizedBox(height: 5.h),
           Text(
@@ -249,10 +292,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
   OutlineInputBorder _buildBorder({required Color color, double width = 1.0}) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(12.r),
-      borderSide: BorderSide(
-        color: color,
-        width: width,
-      ),
+      borderSide: BorderSide(color: color, width: width),
     );
   }
 }

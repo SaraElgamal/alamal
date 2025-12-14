@@ -1,8 +1,9 @@
+import 'package:charity_app/core/helpers/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:charity_app/core/helpers/url_launcher_helper.dart';
-import '../../data/models/case_model.dart';
+
 import '../../../../core/navigation/routes/app_routes.dart';
+import '../../data/models/case_model.dart';
 
 class CaseDetailsScreen extends StatelessWidget {
   final CaseModel caseEntity;
@@ -38,7 +39,7 @@ class CaseDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('بيانات مقدم الطلب'),
+            _buildSectionTitle(context, 'بيانات مقدم الطلب'),
             _buildInfoRow('الاسم', caseEntity.applicant.name),
             _buildInfoRow('الرقم القومي', caseEntity.applicant.nationalId),
             _buildInfoRow('السن', caseEntity.applicant.age.toString()),
@@ -53,7 +54,7 @@ class CaseDetailsScreen extends StatelessWidget {
 
             if (caseEntity.spouse != null) ...[
               const Divider(),
-              _buildSectionTitle('بيانات الزوج/الزوجة'),
+              _buildSectionTitle(context, 'بيانات الزوج/الزوجة'),
               _buildInfoRow('الاسم', caseEntity.spouse!.name),
               _buildInfoRow('الرقم القومي', caseEntity.spouse!.nationalId),
               _buildInfoRow('السن', caseEntity.spouse!.age.toString()),
@@ -67,7 +68,7 @@ class CaseDetailsScreen extends StatelessWidget {
             ],
 
             const Divider(),
-            _buildSectionTitle('تفاصيل الحالة'),
+            _buildSectionTitle(context, 'تفاصيل الحالة'),
             _buildInfoRow('التوصيف', caseEntity.caseDescription),
             _buildInfoRow(
               'دخل الأسرة الإجمالي',
@@ -79,7 +80,7 @@ class CaseDetailsScreen extends StatelessWidget {
             ),
 
             const Divider(),
-            _buildSectionTitle('المصروفات'),
+            _buildSectionTitle(context, 'المصروفات'),
             _buildInfoRow(
               'إجمالي المصروفات',
               caseEntity.expenses.total.toString(),
@@ -91,15 +92,15 @@ class CaseDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Colors.blue,
+          color: Theme.of(context).primaryColor,
         ),
       ),
     );

@@ -1,10 +1,11 @@
 import 'package:charity_app/core/helpers/biometric_helper.dart';
 import 'package:charity_app/core/navigation/routes/app_routes.dart';
+import 'package:charity_app/core/widgets/buttons/loading_button.dart';
 import 'package:charity_app/core/widgets/custom_messages.dart';
 import 'package:charity_app/core/widgets/custom_text_form_field.dart';
-import 'package:charity_app/core/widgets/buttons/loading_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 class AdminLoginScreen extends StatefulWidget {
@@ -132,7 +133,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('دخول الإدارة')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         child: Form(
           key: _formKey,
           child: Column(
@@ -160,12 +161,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               LoadingButton(
                 title: 'دخول',
                 onTap: () => _login(),
-                borderRadius: 8,
-                height: 50,
+                borderRadius: 8.r,
+                height: 50.h,
               ),
             ],
           ),

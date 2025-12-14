@@ -1,3 +1,4 @@
+import 'package:charity_app/core/config/res/color_manager.dart';
 import 'package:charity_app/core/config/res/refactor_color_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,10 +7,10 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    primaryColor: const Color(0xFF1E88E5),
+    primaryColor: AppColors.primary,
     scaffoldBackgroundColor: const Color(0xFFF5F5F5),
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1E88E5),
+      seedColor: AppColors.primary,
       brightness: Brightness.light,
     ),
     textTheme: GoogleFonts.cairoTextTheme(ThemeData.light().textTheme),
@@ -32,13 +33,13 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF1E88E5), width: 2),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF1E88E5),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -51,10 +52,10 @@ class AppTheme {
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    primaryColor: const Color(0xFF90CAF9),
+    primaryColor: AppColors.primary,
     scaffoldBackgroundColor: const Color(0xFF121212),
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1E88E5),
+      seedColor: AppColors.primary,
       brightness: Brightness.dark,
     ),
     textTheme: GoogleFonts.cairoTextTheme(ThemeData.dark().textTheme),
@@ -77,13 +78,13 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF90CAF9), width: 2),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF90CAF9),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

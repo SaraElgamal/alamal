@@ -1,3 +1,4 @@
+import 'package:charity_app/core/widgets/text_form_filed_widget.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -10,6 +11,9 @@ class CustomTextFormField extends StatelessWidget {
   final void Function(String)? onChanged;
   final Widget? suffixIcon;
   final Widget? prefixIcon;
+  final String? hint;
+  final bool hasTextAbove;
+  final TextInputAction? textInputAction;
 
   const CustomTextFormField({
     super.key,
@@ -22,25 +26,27 @@ class CustomTextFormField extends StatelessWidget {
     this.onChanged,
     this.suffixIcon,
     this.prefixIcon,
+    this.hint,
+    this.hasTextAbove = false,
+    this.textInputAction,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
+      child: TextFormFieldWidget(
         controller: controller,
+        hasTextAbove: hasTextAbove,
         keyboardType: keyboardType,
         validator: validator,
         maxLines: maxLines,
-        obscureText: obscureText,
         onChanged: onChanged,
-        decoration: InputDecoration(
-          labelText: label,
-          alignLabelWithHint: true,
-          suffixIcon: suffixIcon,
-          prefixIcon: prefixIcon,
-        ),
+        hint: hint,
+        suffixIcon: suffixIcon,
+        prefixIcon: prefixIcon,
+        label: label,
+        textInputAction: textInputAction,
       ),
     );
   }

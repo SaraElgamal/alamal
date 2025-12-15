@@ -1,3 +1,4 @@
+import 'package:charity_app/core/widgets/buttons/loading_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -34,18 +35,11 @@ class WizardNavigationBar extends StatelessWidget {
         children: [
           SizedBox(
             width: double.infinity,
-            height: 48.h,
-            child: ElevatedButton(
-              onPressed: onNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
+            child: LoadingButton(
+              margin: EdgeInsets.zero,
+              onTap: () async => onNext(),
+              title: isLastStep ? 'تأكيد وإرسال' : 'التالي',
+              customChild: Text(
                 isLastStep ? 'تأكيد وإرسال' : 'التالي',
                 style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
               ),

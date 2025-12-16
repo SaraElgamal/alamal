@@ -333,9 +333,9 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
 }
 
 const AppColorsExtension lightColors = AppColorsExtension(
-  primary: Color(0xff41ab5d),
-  primary5: Color(0xffC9F1D4), // Lighter Green
-  primaryLightPrimarydark: Color(0xff5DBD80), // Darker Green
+  primary: Color(0xff10B981),
+  primary5: Color(0xff059669  ), // Lighter Green
+  primaryLightPrimarydark: Color(0xff059669), // Darker Green
   scaffoldBackground: AppColors.lightGrey,
   secondary: AppColors.secondary,
   background: AppColors.scaffoldBackground,
@@ -343,7 +343,6 @@ const AppColorsExtension lightColors = AppColorsExtension(
   red50: AppColors.error10,
   success: AppColors.success,
   text: AppColors.black,
-
   error10: AppColors.error10,
   successECFDF3: AppColors.successECFDF3,
   success60: AppColors.success60,
@@ -391,7 +390,7 @@ const AppColorsExtension lightColors = AppColorsExtension(
 
 const AppColorsExtension darkColors = AppColorsExtension(
   primary: AppColors.primary,
-  primary5: Color(0xff2E5C3E), // Dark Green
+  primary5: Color(0xff10B981  ), // Dark Green
   secondary: Color(0xffB3CEE7),
   red50: AppColors.red50,
   background: Color(0xff0F172A),

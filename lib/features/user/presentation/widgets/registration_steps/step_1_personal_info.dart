@@ -1,3 +1,4 @@
+import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:charity_app/core/utils/validation_utils.dart';
 import 'package:charity_app/core/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class Step1PersonalInfo extends StatelessWidget {
               controller: nameController,
               hasTextAbove: true,
               hint: 'ادخل الاسم كما في البطاقة',
-              prefixIcon: const Icon(Icons.person_outline),
+              prefixIcon:  Icon(Icons.person_outline , color: context.colors.primary ,),
               validator: ValidationUtils.validateName,
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.name,
@@ -43,7 +44,7 @@ class Step1PersonalInfo extends StatelessWidget {
               controller: nationalIdController,
               hasTextAbove: true,
               hint: '14 رقم',
-              prefixIcon: const Icon(Icons.credit_card),
+              prefixIcon:  Icon(Icons.credit_card, color: context.colors.primary),
               validator: ValidationUtils.validateNationalId,
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.number,
@@ -53,7 +54,7 @@ class Step1PersonalInfo extends StatelessWidget {
               controller: ageController,
               hasTextAbove: true,
               hint: 'السن',
-              prefixIcon: const Icon(Icons.calendar_today),
+              prefixIcon:  Icon(Icons.calendar_today, color: context.colors.primary),
               validator: (v) => ValidationUtils.validateAge(v, required: true),
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.number,
@@ -63,7 +64,7 @@ class Step1PersonalInfo extends StatelessWidget {
               controller: phoneController,
               hasTextAbove: true,
               hint: 'رقم للتواصل',
-              prefixIcon: const Icon(Icons.phone),
+              prefixIcon:  Icon(Icons.phone, color: context.colors.primary),
               validator: (v) =>
                   ValidationUtils.validatePhone(v, required: true),
               textInputAction: TextInputAction.next,
@@ -74,7 +75,7 @@ class Step1PersonalInfo extends StatelessWidget {
               controller: jobController,
               hasTextAbove: true,
               hint: 'المهنة الحالية',
-              prefixIcon: const Icon(Icons.work_outline),
+              prefixIcon:  Icon(Icons.work_outline, color: context.colors.primary),
               validator: (v) =>
                   ValidationUtils.validateRequired(v, fieldName: 'المهنة'),
               textInputAction: TextInputAction.done,

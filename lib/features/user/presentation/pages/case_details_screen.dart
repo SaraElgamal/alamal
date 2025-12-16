@@ -1,3 +1,4 @@
+import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:charity_app/core/helpers/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +28,7 @@ class CaseDetailsScreen extends StatelessWidget {
         actions: [
           if (showEditAction)
             IconButton(
-              icon: const Icon(Icons.edit),
+              icon:  Icon(Icons.edit, color: context.colors.primary,),
               onPressed: () {
                 context.push(AppRoutes.editCase, extra: caseEntity);
               },

@@ -1,3 +1,4 @@
+import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -19,9 +20,10 @@ class CustomSelectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = isSelected ? theme.primaryColor : Colors.grey.shade400;
-    final bgColor = isSelected
-        ? theme.primaryColor.withValues(alpha: 0.1)
-        : Colors.white;
+    final bgColor = context.colors.background;
+    // isSelected
+    //     ? theme.primaryColor.withValues(alpha: 0.1)
+    //     : context.colors.background;
 
     return GestureDetector(
       onTap: onTap,
@@ -32,15 +34,7 @@ class CustomSelectionCard extends StatelessWidget {
           color: bgColor,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(color: color, width: isSelected ? 2 : 1),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
+          boxShadow: [],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

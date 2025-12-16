@@ -1,3 +1,4 @@
+import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:charity_app/core/widgets/buttons/loading_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,7 +20,7 @@ class WizardNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 22.h),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
@@ -46,25 +47,19 @@ class WizardNavigationBar extends StatelessWidget {
             ),
           ),
           if (!isFirstStep) ...[
-            SizedBox(height: 12.h),
-            SizedBox(
-              width: double.infinity,
-              height: 48.h,
-              child: OutlinedButton(
-                onPressed: onBack,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Theme.of(context).primaryColor),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                ),
-                child: Text(
-                  'السابق',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
-                  ),
+            SizedBox(height: 15.h),
+            LoadingButton(
+              margin: EdgeInsets.zero,
+              borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              title: 'السابق',
+              color: context.colors.background,
+              onTap:   () async => onBack,
+              customChild: Text(
+                'السابق',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
             ),

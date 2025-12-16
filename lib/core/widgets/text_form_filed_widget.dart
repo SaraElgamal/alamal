@@ -152,8 +152,8 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
                     widget.textAboveStyle ??
                     TextStyle(
                       color: colors.textSubtle,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w700,
                     ),
               ),
               if (widget.isRequired == true) ...[
@@ -221,7 +221,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
                 TextStyle(
                   color: _isFocused ? colors.primary : colors.hintText,
                   fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
             floatingLabelBehavior: widget.floatingLabelBehavior,
             hintText: widget.hint,
@@ -232,13 +232,14 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
                 widget.hintStyle ??
                 TextStyle(
                   color: colors.hintText,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                   fontSize: 14.sp,
+                  
                 ),
             errorStyle: TextStyle(
               color: colors.error,
               fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
             errorMaxLines: 3,
             prefixIcon: Padding(

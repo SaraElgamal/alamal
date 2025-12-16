@@ -51,7 +51,7 @@ class LoadingButton extends StatelessWidget {
         minWidth: AppSize.sW50,
         height: height ?? AppSize.sH50,
         color: color ?? context.colors.primary,
-        borderRadius: borderRadius ?? AppSize.sH10,
+        borderRadius: borderRadius ?? AppSize.sH30,
         disabledColor: color ?? context.colors.primary5,
         borderSide: borderSide,
         loader: CustomLoading.showDotLoader(

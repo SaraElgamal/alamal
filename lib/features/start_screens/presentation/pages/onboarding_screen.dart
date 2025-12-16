@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:charity_app/core/config/res/color_manager.dart';
 import 'package:charity_app/core/helpers/cache_service.dart';
 import 'package:charity_app/core/navigation/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               'تخطي',
               style: TextStyle(
                 fontSize: 16.sp,
-                color: Colors.grey,
+                color: AppColors.primary,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -182,12 +183,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
+                      
                       padding: EdgeInsets.symmetric(
-                        horizontal: 32.w,
-                        vertical: 12.h,
+                        horizontal: 42.w,
+                        vertical: 10.h,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(30.r),
                       ),
                     ),
                     child: Text(

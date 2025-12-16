@@ -54,19 +54,19 @@ class _Step2SpouseInfoState extends State<Step2SpouseInfo> {
               children: [
                 Expanded(
                   child: CustomSelectionCard(
-                    title: 'متزوج/ة',
-                    icon: Icons.people_alt,
-                    isSelected: widget.hasSpouse,
-                    onTap: () => widget.onSpouseChanged(true),
+                    title: 'أعزب/أرمل/مطلق',
+                    icon: Icons.person_outline,
+                    isSelected: !widget.hasSpouse,
+                    onTap: () => widget.onSpouseChanged(false),
                   ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: CustomSelectionCard(
-                    title: 'أعزب/أرمل/مطلق',
-                    icon: Icons.person,
-                    isSelected: !widget.hasSpouse,
-                    onTap: () => widget.onSpouseChanged(false),
+                    title: 'متزوج/ة',
+                    icon: Icons.people_alt_outlined,
+                    isSelected: widget.hasSpouse,
+                    onTap: () => widget.onSpouseChanged(true),
                   ),
                 ),
               ],

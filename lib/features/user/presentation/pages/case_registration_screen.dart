@@ -506,7 +506,6 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         title: const Text('تسجيل حالة جديدة'),
         centerTitle: true,

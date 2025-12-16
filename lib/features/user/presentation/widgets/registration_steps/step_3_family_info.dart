@@ -123,7 +123,6 @@ class _Step3FamilyCaseInfoState extends State<Step3FamilyCaseInfo> {
             SizedBox(height: 16.h),
             const Divider(),
             SizedBox(height: 16.h),
-
             CustomTextFormField(
               label: 'عدد الأفراد في التموين',
               controller: widget.rationCardCountController,

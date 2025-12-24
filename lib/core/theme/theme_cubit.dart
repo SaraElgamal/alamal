@@ -30,7 +30,7 @@ class ThemeCubit extends Cubit<AppThemeMode> {
     final newMode = state == AppThemeMode.light
         ? AppThemeMode.dark
         : state == AppThemeMode.dark
-            ? AppThemeMode.system
+            ? AppThemeMode.light
             : AppThemeMode.light;
     await setTheme(newMode);
   }

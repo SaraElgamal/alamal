@@ -53,7 +53,7 @@ class WizardNavigationBar extends StatelessWidget {
               borderSide: BorderSide(color: Theme.of(context).primaryColor),
               title: 'السابق',
               color: context.colors.background,
-              onTap:   () async => onBack,
+              onTap: () async => onBack?.call(),
               customChild: Text(
                 'السابق',
                 style: TextStyle(

@@ -28,7 +28,7 @@ class CaseDetailsScreen extends StatelessWidget {
         actions: [
           if (showEditAction)
             IconButton(
-              icon:  Icon(Icons.edit, color: context.colors.primary,),
+              icon: Icon(Icons.edit, color: context.colors.primary),
               onPressed: () {
                 context.push(AppRoutes.editCase, extra: caseEntity);
               },
@@ -73,7 +73,7 @@ class CaseDetailsScreen extends StatelessWidget {
             _buildInfoRow('التوصيف', caseEntity.caseDescription),
             _buildInfoRow(
               'دخل الأسرة الإجمالي',
-              caseEntity.totalFamilyIncome.toString(),
+              caseEntity.manualTotalFamilyIncome.toString(),
             ),
             _buildInfoRow(
               'عدد أفراد الأسرة',

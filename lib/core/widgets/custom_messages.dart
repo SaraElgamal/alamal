@@ -8,6 +8,7 @@ import 'package:charity_app/core/config/res/app_sizes.dart';
 import 'package:charity_app/core/config/res/color_manager.dart';
 import 'package:charity_app/core/config/res/constants_manager.dart';
 import 'package:charity_app/core/helpers/context_extension.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MessageUtils {
   static OverlayEntry? _currentOverlay;
@@ -121,11 +122,10 @@ class MessageUtils {
       duration: const Duration(seconds: ConstantManager.snackbarDuration),
       content: Text(
         message,
-        style: TextStyle(
+        style: GoogleFonts.cairo(
           color: textColor ?? NavigationService.currentContext!.colors.error,
-          fontSize: FontSize.s14,
+          fontSize: FontSize.s16,
           fontWeight: FontWeight.w600,
-          fontFamily: ConstantManager.fontFamily,
         ),
       ),
       backgroundColor:
@@ -318,7 +318,7 @@ class _TopNoticeOverlayState extends State<_TopNoticeOverlay>
                                   size: 16.sp,
                                 ),
                               ),
-                              // AppSize.sW12.szW,
+                              SizedBox(width: 12.w),
                               Expanded(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -326,25 +326,19 @@ class _TopNoticeOverlayState extends State<_TopNoticeOverlay>
                                   children: [
                                     Text(
                                       widget.message,
-                                      style: TextStyle(
-                                        color: widget.foregroundColor,
-                                        fontSize: FontSize.s14,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: ConstantManager.fontFamily,
-                                      ),
+                                      style: GoogleFonts.cairo(
+                                          color: widget.foregroundColor,
+                                          fontSize: FontSize.s14,
+                                          fontWeight: FontWeight.w600),
                                     ),
                                     if (widget.body != null) ...[
                                       //   AppSize.sH4.szH,
                                       Text(
                                         widget.body!,
-                                        style: TextStyle(
-                                          color: widget.foregroundColor
-                                              .withOpacity(0.9),
-                                          fontSize: FontSize.s12,
-                                          fontWeight: FontWeight.w400,
-                                          fontFamily:
-                                              ConstantManager.fontFamily,
-                                        ),
+                                        style: GoogleFonts.cairo(
+                                            color: widget.foregroundColor,
+                                            fontSize: FontSize.s14,
+                                            fontWeight: FontWeight.w600),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                       ),

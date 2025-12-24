@@ -11,6 +11,7 @@ class CaseModel extends Equatable {
   final List<PersonModel> familyMembers;
   final int rationCardCount;
   final int pensionCount;
+  final double manualTotalFamilyIncome;
   final ExpensesModel expenses;
   final List<AidModel> aidHistory;
   final DateTime createdAt;
@@ -23,12 +24,13 @@ class CaseModel extends Equatable {
     required this.familyMembers,
     required this.rationCardCount,
     required this.pensionCount,
+    required this.manualTotalFamilyIncome,
     required this.expenses,
     required this.aidHistory,
     required this.createdAt,
   });
 
-  double get totalFamilyIncome {
+  double get calculatedTotalFamilyIncome {
     double total = applicant.income;
     if (spouse != null) {
       total += spouse!.income;
@@ -54,6 +56,8 @@ class CaseModel extends Equatable {
           [],
       rationCardCount: json['rationCardCount'] ?? 0,
       pensionCount: json['pensionCount'] ?? 0,
+      manualTotalFamilyIncome: (json['manualTotalFamilyIncome'] ?? 0.0)
+          .toDouble(),
       expenses: ExpensesModel.fromJson(json['expenses'] ?? {}),
       aidHistory:
           (json['aidHistory'] as List<dynamic>?)
@@ -72,6 +76,7 @@ class CaseModel extends Equatable {
       'familyMembers': familyMembers.map((e) => e.toJson()).toList(),
       'rationCardCount': rationCardCount,
       'pensionCount': pensionCount,
+      'manualTotalFamilyIncome': manualTotalFamilyIncome,
       'expenses': expenses.toJson(),
       'aidHistory': aidHistory.map((e) => e.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
@@ -87,6 +92,7 @@ class CaseModel extends Equatable {
     familyMembers,
     rationCardCount,
     pensionCount,
+    manualTotalFamilyIncome,
     expenses,
     aidHistory,
     createdAt,

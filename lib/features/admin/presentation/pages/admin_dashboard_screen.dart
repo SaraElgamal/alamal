@@ -481,6 +481,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           .toList(),
       rationCardCount: c.rationCardCount,
       pensionCount: c.pensionCount,
+      manualTotalFamilyIncome: c.manualTotalFamilyIncome,
       expenses: user_expenses.ExpensesModel(
         rent: c.expenses.rent,
         electricity: c.expenses.electricity,

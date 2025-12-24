@@ -93,7 +93,9 @@ class AdminCasesCubit extends Cubit<AdminCasesState> {
 
     if (state.filterSortByLowestIncome == true) {
       filtered.sort(
-        (a, b) => a.totalFamilyIncome.compareTo(b.totalFamilyIncome),
+        (a, b) => a.calculatedTotalFamilyIncome.compareTo(
+          b.calculatedTotalFamilyIncome,
+        ),
       );
     }
 

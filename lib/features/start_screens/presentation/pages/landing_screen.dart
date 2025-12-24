@@ -1,17 +1,35 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:charity_app/core/helpers/cache_service.dart';
 import 'package:charity_app/core/helpers/context_extension.dart';
-import 'package:charity_app/core/navigation/routes/app_router.dart';
 import 'package:charity_app/core/navigation/routes/app_routes.dart';
-import 'package:charity_app/core/theme/theme_cubit.dart';
 import 'package:charity_app/core/widgets/buttons/loading_button.dart';
 import 'package:charity_app/core/widgets/card_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-class LandingScreen extends StatelessWidget {
+class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
+
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
+  bool _hasDraft = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkDraft();
+  }
+
+  Future<void> _checkDraft() async {
+    final draft = CacheStorage.read('case_draft');
+    setState(() {
+      _hasDraft = draft != null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,17 +42,14 @@ class LandingScreen extends StatelessWidget {
               ClipPath(
                 clipper: LandingHeaderClipper(),
                 child: Image.asset(
-                  'assets/images/backlogo.png', // Ensure this image is suitable for a header
+                  'assets/images/backlogo.png',
                   height: 400.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  color: context.colors.primary.withOpacity(
-                    0.1,
-                  ), // Optional overlay if needed
+                  color: context.colors.primary.withOpacity(0.1),
                   colorBlendMode: BlendMode.darken,
                 ),
               ),
-              // Gradient Overlay for better text visibility if image is busy
               ClipPath(
                 clipper: LandingHeaderClipper(),
                 child: Container(
@@ -53,48 +68,42 @@ class LandingScreen extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(
-                  top: 50.h,
-                  right: 16.w,
-                  left: 16.w,
-                ), // Adjusted top padding for safe area
+                padding: EdgeInsets.only(top: 50.h, right: 16.w, left: 16.w),
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Theme Toggle
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: BlocBuilder<ThemeCubit, AppThemeMode>(
-                          builder: (context, themeMode) {
-                            IconData icon;
-                            if (themeMode == AppThemeMode.light) {
-                              icon = Icons.light_mode;
-                            } else if (themeMode == AppThemeMode.dark) {
-                              icon = Icons.dark_mode;
-                            } else {
-                              icon = Icons.brightness_auto;
-                            }
-                            return IconButton(
-                              icon: Icon(icon, color: Colors.white),
-                              onPressed: () {
-                                context.read<ThemeCubit>().toggleTheme();
-                              },
-                            );
-                          },
-                        ),
-                      ),
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white.withOpacity(0.2),
+                      //     shape: BoxShape.circle,
+                      //   ),
+                      //   child: BlocBuilder<ThemeCubit, AppThemeMode>(
+                      //     builder: (context, themeMode) {
+                      //       IconData icon;
+                      //       if (themeMode == AppThemeMode.light) {
+                      //         icon = Icons.light_mode;
+                      //       } else if (themeMode == AppThemeMode.dark) {
+                      //         icon = Icons.dark_mode;
+                      //       } else {
+                      //         icon = Icons.brightness_auto;
+                      //       }
+                      //       return IconButton(
+                      //         icon: Icon(icon, color: Colors.white),
+                      //         onPressed: () {
+                      //           context.read<ThemeCubit>().toggleTheme();
+                      //         },
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -103,9 +112,15 @@ class LandingScreen extends StatelessWidget {
                   SizedBox(height: 10.h),
                   CardWidget(
                     height: 50.h,
-                    width: 50.w,radius: 8.r,
-                    backgroundColor: context.colors.primary5.withValues(alpha:  0.2),
-                    child: Icon(Icons.energy_savings_leaf_outlined, color: context.colors.primary,),
+                    width: 50.w,
+                    radius: 8.r,
+                    backgroundColor: context.colors.primary5.withValues(
+                      alpha: 0.2,
+                    ),
+                    child: Icon(
+                      Icons.energy_savings_leaf_outlined,
+                      color: context.colors.primary,
+                    ),
                   ),
                   SizedBox(height: 20.h),
                   FadeInDown(
@@ -140,11 +155,13 @@ class LandingScreen extends StatelessWidget {
                     delay: const Duration(milliseconds: 600),
                     child: LoadingButton(
                       onTap: () async {
-                        await AppRouter.router.push(AppRoutes.caseRegistration);
+                        context.push(AppRoutes.caseRegistration).then((_) {
+                          if (mounted) _checkDraft();
+                        });
                       },
-                      title: 'تسجيل مستفيد جديد',
+                      title: _hasDraft ? 'استكمال البيانات' : 'تسجيل جديد',
                       customChild: Text(
-                        'تسجيل مستفيد جديد',
+                        _hasDraft ? 'استكمال البيانات' : 'تسجيل جديد',
                         style: TextStyle(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
@@ -158,11 +175,10 @@ class LandingScreen extends StatelessWidget {
                     child: LoadingButton(
                       title: 'دخول الإدارة',
                       onTap: () async {
-                        context.push(AppRoutes.adminLogin);
+                        await context.push(AppRoutes.adminLogin);
                       },
                       color: context.colors.background,
                       borderSide: BorderSide(color: context.colors.primary),
-
                       customChild: Text(
                         'دخول الإدارة',
                         style: TextStyle(

@@ -626,6 +626,7 @@ class _EditCaseScreenState extends State<EditCaseScreen> {
       familyMembers: _familyMembers,
       rationCardCount: int.tryParse(_rationCardCountController.text) ?? 0,
       pensionCount: int.tryParse(_pensionCountController.text) ?? 0,
+      manualTotalFamilyIncome: widget.caseModel.manualTotalFamilyIncome,
       expenses: expenses,
       aidHistory: widget.caseModel.aidHistory
           .map(

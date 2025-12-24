@@ -42,6 +42,7 @@ class CasesServiceImpl implements CasesService {
       familyMembers: caseModel.familyMembers,
       rationCardCount: caseModel.rationCardCount,
       pensionCount: caseModel.pensionCount,
+      manualTotalFamilyIncome: caseModel.manualTotalFamilyIncome,
       expenses: caseModel.expenses,
       aidHistory: caseModel.aidHistory,
       createdAt: caseModel.createdAt,

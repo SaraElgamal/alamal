@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:charity_app/core/navigation/routes/app_routes.dart';
 import 'package:charity_app/core/helpers/cache_service.dart';
 import 'package:charity_app/core/utils/validation_utils.dart';
 import 'package:charity_app/core/widgets/custom_messages.dart';
@@ -19,9 +20,7 @@ import 'package:charity_app/features/user/presentation/widgets/registration_step
 import 'package:charity_app/features/user/presentation/widgets/wizard_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class CaseRegistrationScreen extends StatefulWidget {
   const CaseRegistrationScreen({super.key});
@@ -40,7 +39,7 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
   final _step2Key = GlobalKey<FormState>();
   final _step3Key = GlobalKey<FormState>();
   final _step4Key = GlobalKey<FormState>();
-  // final _step5Key = GlobalKey<FormState>(); // Unused
+  final _step5Key = GlobalKey<FormState>();
 
   // Controllers - Personal
   final _nameController = TextEditingController();
@@ -61,9 +60,12 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
   final _spousePhoneController = TextEditingController();
 
   // Controllers - Family & Case
+  List<String> _selectedStatuses = [];
+  final _otherStatusController = TextEditingController();
   final _caseDescriptionController = TextEditingController();
   final _rationCardCountController = TextEditingController();
   final _pensionCountController = TextEditingController();
+  final _totalFamilyIncomeController = TextEditingController();
   final List<PersonModel> _familyMembers = [];
 
   // Controllers - Expenses
@@ -77,7 +79,11 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
   final _otherExpensesController = TextEditingController();
 
   // Aid
-  final List<AidModel> _aidHistory = [];
+  bool _hasReceivedAid = false;
+  AidType _selectedAidType = AidType.cash;
+  final _aidValueController = TextEditingController();
+  final _aidDescController = TextEditingController();
+  DateTime? _selectedAidDate;
 
   @override
   void initState() {
@@ -104,6 +110,8 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
       _caseDescriptionController,
       _rationCardCountController,
       _pensionCountController,
+      _totalFamilyIncomeController,
+      _otherStatusController,
       _rentController,
       _electricityController,
       _waterController,
@@ -112,6 +120,8 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
       _treatmentController,
       _debtController,
       _otherExpensesController,
+      _aidValueController,
+      _aidDescController,
     ];
 
     for (final controller in controllers) {
@@ -135,9 +145,12 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
       'spouseProfession': _spouseProfessionController.text,
       'spouseIncome': _spouseIncomeController.text,
       'spousePhone': _spousePhoneController.text,
+      'otherStatus': _otherStatusController.text,
+      'selectedStatuses': _selectedStatuses,
       'caseDescription': _caseDescriptionController.text,
       'rationCardCount': _rationCardCountController.text,
       'pensionCount': _pensionCountController.text,
+      'totalFamilyIncome': _totalFamilyIncomeController.text,
       'rent': _rentController.text,
       'electricity': _electricityController.text,
       'water': _waterController.text,
@@ -146,8 +159,12 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
       'treatment': _treatmentController.text,
       'debt': _debtController.text,
       'otherExpenses': _otherExpensesController.text,
+      'hasReceivedAid': _hasReceivedAid,
+      'selectedAidType': _selectedAidType.index,
+      'aidValue': _aidValueController.text,
+      'aidDesc': _aidDescController.text,
+      'aidDate': _selectedAidDate?.toIso8601String(),
       'familyMembers': _familyMembers.map((e) => e.toJson()).toList(),
-      'aidHistory': _aidHistory.map((e) => e.toJson()).toList(),
     };
     await CacheStorage.write('case_draft', jsonEncode(draftData));
   }
@@ -174,9 +191,15 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
               draftData['spouseProfession'] ?? '';
           _spouseIncomeController.text = draftData['spouseIncome'] ?? '';
           _spousePhoneController.text = draftData['spousePhone'] ?? '';
+          _selectedStatuses = List<String>.from(
+            draftData['selectedStatuses'] ?? [],
+          );
+          _otherStatusController.text = draftData['otherStatus'] ?? '';
           _caseDescriptionController.text = draftData['caseDescription'] ?? '';
           _rationCardCountController.text = draftData['rationCardCount'] ?? '';
           _pensionCountController.text = draftData['pensionCount'] ?? '';
+          _totalFamilyIncomeController.text =
+              draftData['totalFamilyIncome'] ?? '';
           _rentController.text = draftData['rent'] ?? '';
           _electricityController.text = draftData['electricity'] ?? '';
           _waterController.text = draftData['water'] ?? '';
@@ -185,6 +208,14 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
           _treatmentController.text = draftData['treatment'] ?? '';
           _debtController.text = draftData['debt'] ?? '';
           _otherExpensesController.text = draftData['otherExpenses'] ?? '';
+
+          _hasReceivedAid = draftData['hasReceivedAid'] ?? false;
+          _selectedAidType = AidType.values[draftData['selectedAidType'] ?? 0];
+          _aidValueController.text = draftData['aidValue'] ?? '';
+          _aidDescController.text = draftData['aidDesc'] ?? '';
+          if (draftData['aidDate'] != null) {
+            _selectedAidDate = DateTime.parse(draftData['aidDate']);
+          }
 
           if (draftData['familyMembers'] != null) {
             _familyMembers.clear();
@@ -196,12 +227,16 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
           }
 
           if (draftData['aidHistory'] != null) {
-            _aidHistory.clear();
-            _aidHistory.addAll(
-              (draftData['aidHistory'] as List)
-                  .map((e) => AidModel.fromJson(e))
-                  .toList(),
-            );
+            // Migrating old draft data if any
+            final list = (draftData['aidHistory'] as List);
+            if (list.isNotEmpty && !_hasReceivedAid) {
+              final lastAid = AidModel.fromJson(list.last);
+              _hasReceivedAid = true;
+              _selectedAidType = lastAid.type;
+              _aidValueController.text = lastAid.value.toString();
+              _aidDescController.text = lastAid.description ?? '';
+              _selectedAidDate = lastAid.date;
+            }
           }
         });
       } catch (e) {
@@ -221,7 +256,10 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
         isValid = _step1Key.currentState!.validate();
         break;
       case 1:
-        isValid = !_hasSpouse || _step2Key.currentState!.validate();
+        // Status is mandatory
+        final isStatusValid = _selectedStatuses.isNotEmpty;
+        final isSpouseValid = !_hasSpouse || _step2Key.currentState!.validate();
+        isValid = isStatusValid && isSpouseValid;
         break;
       case 2:
         isValid = _step3Key.currentState!.validate();
@@ -230,7 +268,29 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
         isValid = _step4Key.currentState!.validate();
         break;
       case 4:
-        isValid = true;
+        if (!_hasReceivedAid) {
+          isValid = true;
+        } else {
+          final isFormValid = _step5Key.currentState?.validate() ?? false;
+          if (!isFormValid) {
+            isValid = false;
+          } else if (_selectedAidType == AidType.cash &&
+              _aidValueController.text.trim().isEmpty) {
+            MessageUtils.showError(
+              'يرجى إدخال قيمة المساعدة النقدية',
+              context: context,
+            );
+            isValid = false;
+          } else if (_selectedAidDate == null) {
+            MessageUtils.showError(
+              'يرجى اختيار تاريخ استلام المساعدة',
+              context: context,
+            );
+            isValid = false;
+          } else {
+            isValid = true;
+          }
+        }
         break;
     }
 
@@ -242,12 +302,34 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
         );
         setState(() => _currentStep++);
       } else {
+        // Final guard before submit
+        if (_hasReceivedAid) {
+          if (_selectedAidDate == null ||
+              (_selectedAidType == AidType.cash &&
+                  _aidValueController.text.trim().isEmpty)) {
+            MessageUtils.showError(
+              'يرجى التأكد من إكمال بيانات المساعدة',
+              context: context,
+            );
+            return;
+          }
+        }
         _submitForm();
       }
     } else {
-      MessageUtils.showError(
-        'يرجى التأكد من ادخال البيانات المطلوبة بشكل صحيح',
-      );
+      // Just a fallback error if not already handled specificly
+      if (_hasReceivedAid &&
+          _selectedAidType == AidType.cash &&
+          _aidValueController.text.trim().isEmpty) {
+        // already shown
+      } else if (_hasReceivedAid && _selectedAidDate == null) {
+        // already shown
+      } else {
+        MessageUtils.showError(
+          'من فضلك اكمل كل البيانات المطلوبة',
+          context: context,
+        );
+      }
     }
   }
 
@@ -293,7 +375,6 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
                     hasTextAbove: true,
                     hint: 'الرقم القومي',
                     keyboardType: TextInputType.number,
-                    validator: ValidationUtils.validateNationalId,
                   ),
                   CustomTextFormField(
                     label: 'السن',
@@ -301,17 +382,18 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
                     hasTextAbove: true,
                     hint: 'السن',
                     keyboardType: TextInputType.number,
-                    validator: ValidationUtils.validateAge,
+                    validator: (v) =>
+                        ValidationUtils.validateAge(v, required: true),
                   ),
                   CustomTextFormField(
                     label: 'المهنة',
                     controller: jobC,
                     hasTextAbove: true,
                     hint: 'المهنة',
-                    validator: (v) => ValidationUtils.validateRequired(
-                      v,
-                      fieldName: 'المهنة',
-                    ),
+                    // validator: (v) => ValidationUtils.validateRequired(
+                    //   v,
+                    //   fieldName: 'المهنة',
+                    // ),
                   ),
                   CustomTextFormField(
                     label: 'الدخل',
@@ -319,7 +401,7 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
                     hasTextAbove: true,
                     hint: '0.0',
                     keyboardType: TextInputType.number,
-                    validator: ValidationUtils.validateAmount,
+                    //   validator: ValidationUtils.validateAmount,
                   ),
                 ],
               ),
@@ -352,103 +434,6 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
               child: const Text('إضافة'),
             ),
           ],
-        );
-      },
-    );
-  }
-
-  void _addAidRecord() {
-    final formKey = GlobalKey<FormState>();
-    AidType selectedType = AidType.cash;
-    final valueC = TextEditingController();
-    DateTime selectedDate = DateTime.now();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text('إضافة مساعدة سابقة'),
-              content: SingleChildScrollView(
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      DropdownButtonFormField<AidType>(
-                        initialValue: selectedType,
-                        items: const [
-                          DropdownMenuItem(
-                            value: AidType.cash,
-                            child: Text('نقدية'),
-                          ),
-                          DropdownMenuItem(
-                            value: AidType.other,
-                            child: Text('عينية'),
-                          ),
-                        ],
-                        onChanged: (v) =>
-                            setDialogState(() => selectedType = v!),
-                        decoration: const InputDecoration(
-                          labelText: 'نوع المساعدة',
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      CustomTextFormField(
-                        label: 'القيمة / الوصف',
-                        controller: valueC,
-                        hasTextAbove: true,
-                        hint: 'القيمة',
-                        validator: ValidationUtils.validateRequired,
-                      ),
-                      ListTile(
-                        title: const Text('التاريخ'),
-                        subtitle: Text(
-                          DateFormat('yyyy-MM-dd').format(selectedDate),
-                        ),
-                        trailing: const Icon(Icons.calendar_today),
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: selectedDate,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime.now(),
-                          );
-                          if (date != null)
-                            setDialogState(() => selectedDate = date);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => context.pop(),
-                  child: const Text('إلغاء'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      setState(() {
-                        _aidHistory.add(
-                          AidModel(
-                            type: selectedType,
-                            value: double.tryParse(valueC.text) ?? 0,
-                            date: selectedDate,
-                          ),
-                        );
-                        _saveDraft();
-                      });
-                      context.pop();
-                    }
-                  },
-                  child: const Text('إضافة'),
-                ),
-              ],
-            );
-          },
         );
       },
     );
@@ -487,16 +472,33 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
       other: double.tryParse(_otherExpensesController.text) ?? 0,
     );
 
+    final fullDescription = [
+      ..._selectedStatuses.where((s) => s != 'اخرى'),
+      if (_selectedStatuses.contains('اخرى') &&
+          _otherStatusController.text.isNotEmpty)
+        _otherStatusController.text,
+    ].join(' - ');
+
     final caseEntity = CaseModel(
       id: '',
       applicant: applicant,
       spouse: spouse,
-      caseDescription: _caseDescriptionController.text,
+      caseDescription: fullDescription,
       familyMembers: _familyMembers,
       rationCardCount: int.tryParse(_rationCardCountController.text) ?? 0,
       pensionCount: int.tryParse(_pensionCountController.text) ?? 0,
+      manualTotalFamilyIncome:
+          double.tryParse(_totalFamilyIncomeController.text) ?? 0,
       expenses: expenses,
-      aidHistory: _aidHistory,
+      aidHistory: [
+        if (_hasReceivedAid && _selectedAidDate != null)
+          AidModel(
+            type: _selectedAidType,
+            value: double.tryParse(_aidValueController.text) ?? 0,
+            description: _aidDescController.text,
+            date: _selectedAidDate!,
+          ),
+      ],
       createdAt: DateTime.now(),
     );
 
@@ -505,95 +507,135 @@ class _CaseRegistrationScreenState extends State<CaseRegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('تسجيل حالة جديدة'),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: BlocListener<UserCasesCubit, UserCasesState>(
-        listener: (context, state) {
-          if (state.status == UserCasesStatus.caseAdded) {
-            MessageUtils.showSuccess('تم التسجيل بنجاح');
-            _clearDraft();
-            context.pop();
-          } else if (state.status == UserCasesStatus.error) {
-            MessageUtils.showError(state.errorMessage ?? ' حدث خطأ');
-          }
-        },
-        child: Column(
-          children: [
-            ProgressStepper(currentStep: _currentStep, totalSteps: _totalSteps),
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  Step1PersonalInfo(
-                    formKey: _step1Key,
-                    nameController: _nameController,
-                    nationalIdController: _nationalIdController,
-                    ageController: _ageController,
-                    phoneController: _phoneController,
-                    jobController: _professionController,
-                  ),
-                  Step2SpouseInfo(
-                    formKey: _step2Key,
-                    hasSpouse: _hasSpouse,
-                    onSpouseChanged: (val) {
-                      setState(() => _hasSpouse = val);
-                      _saveDraft();
-                    },
-                    nameController: _spouseNameController,
-                    nationalIdController: _spouseNationalIdController,
-                    ageController: _spouseAgeController,
-                    professionController: _spouseProfessionController,
-                    incomeController: _spouseIncomeController,
-                    phoneController: _spousePhoneController,
-                  ),
-                  Step3FamilyCaseInfo(
-                    formKey: _step3Key,
-                    caseDescriptionController: _caseDescriptionController,
-                    rationCardCountController: _rationCardCountController,
-                    pensionCountController: _pensionCountController,
-                    familyMembers: _familyMembers,
-                    onAddMember: _addFamilyMember,
-                    onDeleteMember: (index) {
-                      setState(() => _familyMembers.removeAt(index));
-                      _saveDraft();
-                    },
-                  ),
-                  Step4Expenses(
-                    formKey: _step4Key,
-                    addressController: _addressController,
-                    rentController: _rentController,
-                    electricityController: _electricityController,
-                    waterController: _waterController,
-                    gasController: _gasController,
-                    educationController: _educationController,
-                    treatmentController: _treatmentController,
-                    debtController: _debtController,
-                    otherExpensesController: _otherExpensesController,
-                  ),
-                  Step5AidHistory(
-                    aidHistory: _aidHistory,
-                    onAddAid: _addAidRecord,
-                    onDeleteAid: (index) {
-                      setState(() => _aidHistory.removeAt(index));
-                      _saveDraft();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
+    return PopScope(
+      canPop: _currentStep == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_currentStep > 0) {
+          _prevPage();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('تسجيل حالة جديدة'),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          elevation: 0,
         ),
-      ),
-      bottomNavigationBar: WizardNavigationBar(
-        onNext: _nextPage,
-        onBack: _prevPage,
-        isLastStep: _currentStep == _totalSteps - 1,
-        isFirstStep: _currentStep == 0,
+        body: BlocListener<UserCasesCubit, UserCasesState>(
+          listener: (context, state) {
+            if (state.status == UserCasesStatus.caseAdded) {
+              MessageUtils.showSuccess('تم التسجيل بنجاح');
+              _clearDraft().then((_) {
+                if (mounted) {
+                  context.go(AppRoutes.registrationSuccess);
+                }
+              });
+            } else if (state.status == UserCasesStatus.error) {
+              MessageUtils.showError(state.errorMessage ?? ' حدث خطأ');
+            }
+          },
+          child: Column(
+            children: [
+              ProgressStepper(
+                currentStep: _currentStep,
+                totalSteps: _totalSteps,
+              ),
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    Step1PersonalInfo(
+                      formKey: _step1Key,
+                      nameController: _nameController,
+                      nationalIdController: _nationalIdController,
+                      ageController: _ageController,
+                      phoneController: _phoneController,
+                      jobController: _professionController,
+                      addressController: _addressController,
+                    ),
+                    Step2SpouseInfo(
+                      formKey: _step2Key,
+                      hasSpouse: _hasSpouse,
+                      onSpouseChanged: (val) {
+                        setState(() => _hasSpouse = val);
+                        _saveDraft();
+                      },
+                      nameController: _spouseNameController,
+                      nationalIdController: _spouseNationalIdController,
+                      ageController: _spouseAgeController,
+                      professionController: _spouseProfessionController,
+                      incomeController: _spouseIncomeController,
+                      phoneController: _spousePhoneController,
+                      selectedStatuses: _selectedStatuses,
+                      onStatusToggled: (status) {
+                        setState(() {
+                          if (_selectedStatuses.contains(status)) {
+                            _selectedStatuses.remove(status);
+                          } else {
+                            _selectedStatuses.add(status);
+                          }
+                        });
+                        _saveDraft();
+                      },
+                      otherStatusController: _otherStatusController,
+                    ),
+                    Step3FamilyCaseInfo(
+                      formKey: _step3Key,
+                      rationCardCountController: _rationCardCountController,
+                      pensionCountController: _pensionCountController,
+                      totalFamilyIncomeController: _totalFamilyIncomeController,
+                      familyMembers: _familyMembers,
+                      onAddMember: _addFamilyMember,
+                      onDeleteMember: (index) {
+                        setState(() => _familyMembers.removeAt(index));
+                        _saveDraft();
+                      },
+                    ),
+                    Step4Expenses(
+                      formKey: _step4Key,
+                      rentController: _rentController,
+                      electricityController: _electricityController,
+                      waterController: _waterController,
+                      gasController: _gasController,
+                      educationController: _educationController,
+                      treatmentController: _treatmentController,
+                      debtController: _debtController,
+                      otherExpensesController: _otherExpensesController,
+                    ),
+                    Step5AidHistory(
+                      formKey: _step5Key,
+                      hasReceivedAid: _hasReceivedAid,
+                      onAidChanged: (val) => setState(() {
+                        _hasReceivedAid = val;
+                        _saveDraft();
+                      }),
+                      selectedAidType: _selectedAidType,
+                      onTypeChanged: (type) => setState(() {
+                        _selectedAidType = type;
+                        _saveDraft();
+                      }),
+                      valueController: _aidValueController,
+                      descriptionController: _aidDescController,
+                      selectedDate: _selectedAidDate,
+                      onDateChanged: (date) => setState(() {
+                        _selectedAidDate = date;
+                        _saveDraft();
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: WizardNavigationBar(
+          onNext: _nextPage,
+          onBack: _prevPage,
+          isLastStep: _currentStep == _totalSteps - 1,
+          isFirstStep: _currentStep == 0,
+        ),
       ),
     );
   }

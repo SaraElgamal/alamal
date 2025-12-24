@@ -1,129 +1,234 @@
+import 'package:charity_app/core/utils/validation_utils.dart';
+import 'package:charity_app/core/widgets/custom_text_form_field.dart';
 import 'package:charity_app/features/user/data/models/aid_model.dart';
+import 'package:charity_app/features/user/presentation/widgets/custom_selection_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 class Step5AidHistory extends StatelessWidget {
-  final List<AidModel> aidHistory;
-  final VoidCallback onAddAid;
-  final ValueChanged<int> onDeleteAid;
+  final GlobalKey<FormState> formKey;
+  final bool hasReceivedAid;
+  final ValueChanged<bool> onAidChanged;
+  final AidType selectedAidType;
+  final ValueChanged<AidType> onTypeChanged;
+  final TextEditingController valueController;
+  final TextEditingController descriptionController;
+  final DateTime? selectedDate;
+  final ValueChanged<DateTime> onDateChanged;
 
   const Step5AidHistory({
     super.key,
-    required this.aidHistory,
-    required this.onAddAid,
-    required this.onDeleteAid,
+    required this.formKey,
+    required this.hasReceivedAid,
+    required this.onAidChanged,
+    required this.selectedAidType,
+    required this.onTypeChanged,
+    required this.valueController,
+    required this.descriptionController,
+    required this.selectedDate,
+    required this.onDateChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+      child: Form(
+        key: formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'هل حصلت على مساعدة من خلال الجمعية من قبل ؟',
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomSelectionCard(
+                    title: 'نعم',
+                    isSelected: hasReceivedAid,
+                    onTap: () => onAidChanged(true),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: CustomSelectionCard(
+                    title: 'لا',
+                    isSelected: !hasReceivedAid,
+                    onTap: () => onAidChanged(false),
+                  ),
+                ),
+              ],
+            ),
+            if (hasReceivedAid) ...[
+              SizedBox(height: 24.h),
+              const Divider(),
+              SizedBox(height: 16.h),
               Text(
-                'سجل المساعدات السابقة',
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-              ),
-              TextButton.icon(
-                onPressed: onAddAid,
-                icon: const Icon(Icons.add_circle),
-                label: const Text('إضافة مساعدة'),
-                style: TextButton.styleFrom(
-                  foregroundColor: Theme.of(context).primaryColor,
+                'بيانات المساعدة : ',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
-            ],
-          ),
-
-          if (aidHistory.isEmpty)
-            Container(
-              padding: EdgeInsets.all(32.r),
-              margin: EdgeInsets.symmetric(vertical: 20.h),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.history_edu,
-                    size: 48.sp,
-                    color: Colors.grey.shade400,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'لا توجد مساعدات سابقة مسجلة',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'إذا حصلت الأسرة على مساعدات سابقة، يرجى إضافتها هنا.',
-                    style: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 12.sp,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            )
-          else
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: aidHistory.length,
-              itemBuilder: (context, index) {
-                final aid = aidHistory[index];
-                final isCash = aid.type == AidType.cash;
-                return Card(
-                  margin: EdgeInsets.only(bottom: 8.h),
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: isCash
-                          ? Colors.green.withValues(alpha: 0.1)
-                          : Colors.orange.withValues(alpha: 0.1),
-                      child: Icon(
-                        isCash
-                            ? Icons.attach_money
-                            : Icons.inventory_2_outlined,
-                        color: isCash ? Colors.green : Colors.orange,
+              SizedBox(height: 16.h),
+              Align(
+                alignment: AlignmentDirectional.center,
+                child: SizedBox(
+                  width: 330.w,
+                  child: DropdownButtonFormField<AidType>(
+                    value: selectedAidType,
+                    isExpanded: false,
+                    isDense: true,
+                    alignment: AlignmentDirectional.center,
+                    borderRadius: BorderRadius.circular(15.r),
+                    items: [
+                      DropdownMenuItem(
+                        value: AidType.cash,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.w),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.monetization_on_outlined,
+                                size: 18.sp,
+                                color: Colors.green,
+                              ),
+                              SizedBox(width: 10.w),
+                              Text(
+                                'مساعدة نقدية',
+                                style: TextStyle(fontSize: 14.sp),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: AidType.food,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.w),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.inventory_2_outlined,
+                                size: 18.sp,
+                                color: Colors.orange,
+                              ),
+                              SizedBox(width: 10.w),
+                              Text(
+                                'مساعدة عينية',
+                                style: TextStyle(fontSize: 14.sp),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) => onTypeChanged(v!),
+                    decoration: InputDecoration(
+                      labelText: 'نوع المساعدة',
+                      labelStyle: TextStyle(fontSize: 14.sp),
+                      // prefixIcon: const Icon(Icons.category_outlined),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 8.h,
                       ),
                     ),
-                    title: Text(
-                      isCash ? 'مساعدة نقدية' : 'مساعدة عينية',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              if (selectedAidType == AidType.cash)
+                CustomTextFormField(
+                  label: 'قيمة المساعدة',
+                  controller: valueController,
+                  hasTextAbove: true,
+                  hint: '0.0',
+                  prefixIcon: const Icon(Icons.attach_money),
+                  keyboardType: TextInputType.number,
+                  validator: (v) =>
+                      ValidationUtils.validateAmount(v, required: true),
+                  textInputAction: TextInputAction.next,
+                )
+              else
+                CustomTextFormField(
+                  label: 'وصف المساعدة العينية',
+                  controller: descriptionController,
+                  hasTextAbove: true,
+                  hint: 'مثال: مواد غذائية، علاج، ملابس...',
+                  prefixIcon: const Icon(Icons.inventory_2_outlined),
+                  validator: null,
+                  textInputAction: TextInputAction.next,
+                ),
+              SizedBox(height: 8.h),
+              InkWell(
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (date != null) {
+                    onDateChanged(date);
+                  }
+                },
+                child: Card(
+                  elevation: 0,
+                  color: Colors.grey.shade50,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    side: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
                       children: [
-                        Text('القيمة/الوصف: ${aid.value}'),
-                        Text(
-                          'التاريخ: ${DateFormat('yyyy-MM-dd').format(aid.date)}',
-                          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                        Icon(
+                          Icons.calendar_today,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        SizedBox(width: 12.w),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'تاريخ استلام المساعدة',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            Text(
+                              selectedDate != null
+                                  ? DateFormat(
+                                      'yyyy-MM-dd',
+                                    ).format(selectedDate!)
+                                  : 'اختر التاريخ',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: selectedDate != null
+                                    ? Colors.black87
+                                    : Colors.red,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      onPressed: () => onDeleteAid(index),
-                    ),
                   ),
-                );
-              },
-            ),
-        ],
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

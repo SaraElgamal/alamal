@@ -78,7 +78,7 @@ class CasesRepositoryImpl implements CasesRepository {
           TextCellValue(c.applicant.address ?? ''),
           TextCellValue(c.caseDescription),
           TextCellValue(c.spouse?.name ?? 'لا يوجد'),
-          DoubleCellValue(c.totalFamilyIncome),
+          DoubleCellValue(c.manualTotalFamilyIncome),
           IntCellValue(c.familyMembers.length + 1 + (c.spouse != null ? 1 : 0)),
           DoubleCellValue(c.expenses.total),
           TextCellValue(c.createdAt.toString().split(' ')[0]),

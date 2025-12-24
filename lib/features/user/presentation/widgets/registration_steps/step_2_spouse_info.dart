@@ -1,3 +1,4 @@
+import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:charity_app/core/utils/validation_utils.dart';
 import 'package:charity_app/core/widgets/custom_text_form_field.dart';
 import 'package:charity_app/features/user/presentation/widgets/custom_selection_card.dart';
@@ -15,6 +16,11 @@ class Step2SpouseInfo extends StatefulWidget {
   final TextEditingController incomeController;
   final TextEditingController phoneController;
 
+  // New parameters
+  final List<String> selectedStatuses;
+  final ValueChanged<String> onStatusToggled;
+  final TextEditingController otherStatusController;
+
   const Step2SpouseInfo({
     super.key,
     required this.formKey,
@@ -26,6 +32,9 @@ class Step2SpouseInfo extends StatefulWidget {
     required this.professionController,
     required this.incomeController,
     required this.phoneController,
+    required this.selectedStatuses,
+    required this.onStatusToggled,
+    required this.otherStatusController,
   });
 
   @override
@@ -33,48 +42,145 @@ class Step2SpouseInfo extends StatefulWidget {
 }
 
 class _Step2SpouseInfoState extends State<Step2SpouseInfo> {
-  // 0: Unspecified/Single, 1: Married (Has Spouse)
-  // Simple toggle for now based on 'hasSpouse'
+  final List<String> _options = [
+    'ارملة',
+    'مطلقه',
+    'مريضه',
+    'هجر',
+    'مدينه',
+    'اخرى',
+  ];
+
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _spouseFormKey = GlobalKey();
+
+  void _scrollToSpouse() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_spouseFormKey.currentContext != null) {
+        Scrollable.ensureVisible(
+          _spouseFormKey.currentContext!,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: _scrollController,
       padding: const EdgeInsets.all(16.0),
       child: Form(
         key: widget.formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              children: [
+                Text(
+                  'اختر توصيف الحالة',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  ' *',
+                  style: TextStyle(color: Colors.red, fontSize: 16.sp),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Wrap(
+              spacing: 8.w,
+              runSpacing: 8.h,
+              children: _options.map((option) {
+                final isSelected = widget.selectedStatuses.contains(option);
+                return FilterChip(
+                  label: Text(option),
+                  selected: isSelected,
+                  onSelected: (_) => widget.onStatusToggled(option),
+                  selectedColor: Theme.of(
+                    context,
+                  ).primaryColor.withOpacity(0.2),
+                  checkmarkColor: Theme.of(context).primaryColor,
+                  labelStyle: TextStyle(
+                    color: isSelected
+                        ? Theme.of(context).primaryColor
+                        : Colors.black87,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                  backgroundColor: Colors.grey.shade100,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                    side: BorderSide(
+                      color: isSelected
+                          ? Theme.of(context).primaryColor
+                          : context.colors.black40,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            if (widget.selectedStatuses.contains('اخرى')) ...[
+              SizedBox(height: 12.h),
+              CustomTextFormField(
+                label: 'توصيف الحالة الأخرى',
+                controller: widget.otherStatusController,
+                hasTextAbove: true,
+                hint: 'اكتب الحالة الأخرى هنا...',
+                validator: (v) => widget.selectedStatuses.contains('اخرى')
+                    ? ValidationUtils.validateRequired(
+                        v,
+                        fieldName: 'الحالة الأخرى',
+                      )
+                    : null,
+              ),
+            ],
+            SizedBox(height: 24.h),
+            const Divider(),
+            SizedBox(height: 16.h),
             Text(
-              'الحالة الاجتماعية',
+              'هل أنت متزوج / متزوجة؟',
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 12.h),
             Row(
               children: [
                 Expanded(
                   child: CustomSelectionCard(
-                    title: 'أعزب/أرمل/مطلق',
-                    icon: Icons.person_outline,
-                    isSelected: !widget.hasSpouse,
-                    onTap: () => widget.onSpouseChanged(false),
+                    title: 'نعم',
+                    isSelected: widget.hasSpouse,
+                    onTap: () {
+                      widget.onSpouseChanged(true);
+                      _scrollToSpouse();
+                    },
                   ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: CustomSelectionCard(
-                    title: 'متزوج/ة',
-                    icon: Icons.people_alt_outlined,
-                    isSelected: widget.hasSpouse,
-                    onTap: () => widget.onSpouseChanged(true),
+                    title: 'لا',
+                    isSelected: !widget.hasSpouse,
+                    onTap: () => widget.onSpouseChanged(false),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 24.h),
             if (widget.hasSpouse) ...[
+              SizedBox(height: 24.h),
               Text(
                 'بيانات الزوج/الزوجة',
+                key: _spouseFormKey,
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
@@ -107,7 +213,7 @@ class _Step2SpouseInfoState extends State<Step2SpouseInfo> {
                 keyboardType: TextInputType.number,
                 hasTextAbove: true,
                 hint: 'السن',
-                validator: ValidationUtils.validateAge,
+                validator: (val) => ValidationUtils.validateAge(val,required: true),
                 textInputAction: TextInputAction.next,
               ),
               CustomTextFormField(

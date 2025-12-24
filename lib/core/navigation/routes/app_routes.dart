@@ -8,6 +8,7 @@ class AppRoutes {
   static const String adminLogin = '/admin-login';
   static const String adminDashboard = '/admin-dashboard';
   static const String caseRegistration = '/case-registration';
+  static const String registrationSuccess = '/registration-success';
   static const String caseDetails = '/case-details';
   static const String editCase = '/edit-case';
   static const String profile = '/profile';

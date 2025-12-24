@@ -6,9 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Step3FamilyCaseInfo extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  final TextEditingController caseDescriptionController;
   final TextEditingController rationCardCountController;
   final TextEditingController pensionCountController;
+  final TextEditingController totalFamilyIncomeController;
   final List<PersonModel> familyMembers;
   final VoidCallback onAddMember;
   final ValueChanged<int> onDeleteMember;
@@ -16,9 +16,9 @@ class Step3FamilyCaseInfo extends StatefulWidget {
   const Step3FamilyCaseInfo({
     super.key,
     required this.formKey,
-    required this.caseDescriptionController,
     required this.rationCardCountController,
     required this.pensionCountController,
+    required this.totalFamilyIncomeController,
     required this.familyMembers,
     required this.onAddMember,
     required this.onDeleteMember,
@@ -37,21 +37,6 @@ class _Step3FamilyCaseInfoState extends State<Step3FamilyCaseInfo> {
         key: widget.formKey,
         child: Column(
           children: [
-            CustomTextFormField(
-              label: 'توصيف الحالة',
-              controller: widget.caseDescriptionController,
-              hasTextAbove: true,
-              hint: 'اشرح ظروف المريض/الحالة بالتفصيل...',
-              maxLines: 4,
-              validator: (v) => ValidationUtils.validateRequired(
-                v,
-                fieldName: 'توصيف الحالة',
-              ),
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-            ),
-            SizedBox(height: 16.h),
-
             // Family Members Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -65,8 +50,14 @@ class _Step3FamilyCaseInfoState extends State<Step3FamilyCaseInfo> {
                 ),
                 TextButton.icon(
                   onPressed: widget.onAddMember,
-                  icon: const Icon(Icons.add_circle),
-                  label: const Text('إضافة فرد'),
+                  icon: Icon(Icons.add_circle, size: 24.sp),
+                  label: Text(
+                    'إضافة فرد',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   style: TextButton.styleFrom(
                     foregroundColor: Theme.of(context).primaryColor,
                   ),
@@ -106,7 +97,9 @@ class _Step3FamilyCaseInfoState extends State<Step3FamilyCaseInfo> {
                       leading: CircleAvatar(child: Text('${index + 1}')),
                       title: Text(member.name),
                       subtitle: Text(
-                        '${member.profession} - ${member.age} سنة',
+                        member.profession != ''
+                            ? '${member.age} سنة - ${member.profession}'
+                            : '${member.age} سنة',
                       ),
                       trailing: IconButton(
                         icon: const Icon(
@@ -123,6 +116,17 @@ class _Step3FamilyCaseInfoState extends State<Step3FamilyCaseInfo> {
             SizedBox(height: 16.h),
             const Divider(),
             SizedBox(height: 16.h),
+            CustomTextFormField(
+              label: 'اجمالي دخل الأسرة',
+              controller: widget.totalFamilyIncomeController,
+              keyboardType: TextInputType.number,
+              hasTextAbove: true,
+              hint: '0.0',
+              prefixIcon: const Icon(Icons.money),
+              validator: (v) =>
+                  ValidationUtils.validateAmount(v, required: true),
+              textInputAction: TextInputAction.next,
+            ),
             CustomTextFormField(
               label: 'عدد الأفراد في التموين',
               controller: widget.rationCardCountController,

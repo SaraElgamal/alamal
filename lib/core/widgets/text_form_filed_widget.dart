@@ -197,7 +197,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
           keyboardType: widget.keyboardType,
           onTap: widget.onTap,
           onChanged: (value) {
-            _updateTextDirection(value);
+             _updateTextDirection(value);
             widget.onChanged?.call(value);
           },
           readOnly: widget.readOnly,
@@ -210,7 +210,8 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
               _textDirection ??
               ((widget.keyboardType == TextInputType.phone)
                   ? TextDirection.ltr
-                  : Directionality.of(context)),
+                  : 
+                  Directionality.of(context) ),
           decoration: InputDecoration(
             icon: widget.icon,
             filled: true,
@@ -225,9 +226,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
                 ),
             floatingLabelBehavior: widget.floatingLabelBehavior,
             hintText: widget.hint,
-            hintTextDirection: (widget.keyboardType == TextInputType.phone)
-                ? TextDirection.ltr
-                : Directionality.of(context),
+            hintTextDirection: Directionality.of(context),
             hintStyle:
                 widget.hintStyle ??
                 TextStyle(

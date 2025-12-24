@@ -4,14 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomSelectionCard extends StatelessWidget {
   final String title;
-  final IconData icon;
+ // final IconData icon;
   final bool isSelected;
   final VoidCallback onTap;
 
   const CustomSelectionCard({
     super.key,
     required this.title,
-    required this.icon,
+   // required this.icon,
     required this.isSelected,
     required this.onTap,
   });
@@ -39,8 +39,8 @@ class CustomSelectionCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 32.sp, color: color),
-            SizedBox(height: 8.h),
+            // Icon(icon, size: 32.sp, color: color),
+            // SizedBox(height: 8.h),
             Text(
               title,
               style: TextStyle(

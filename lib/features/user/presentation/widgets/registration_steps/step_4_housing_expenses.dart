@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Step4Expenses extends StatelessWidget {
   final GlobalKey<FormState> formKey;
-  final TextEditingController addressController;
   final TextEditingController rentController;
   final TextEditingController electricityController;
   final TextEditingController waterController;
@@ -18,7 +17,6 @@ class Step4Expenses extends StatelessWidget {
   const Step4Expenses({
     super.key,
     required this.formKey,
-    required this.addressController,
     required this.rentController,
     required this.electricityController,
     required this.waterController,
@@ -38,18 +36,7 @@ class Step4Expenses extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomTextFormField(
-              label: 'العنوان تفصيلياً',
-              controller: addressController,
-              hasTextAbove: true,
-              hint: 'المحافظة - المدينة - الشارع - رقم العقار',
-              prefixIcon: const Icon(Icons.location_on),
-              maxLines: 2,
-              validator: (v) =>
-                  ValidationUtils.validateRequired(v, fieldName: 'العنوان'),
-              textInputAction: TextInputAction.next,
-            ),
-            SizedBox(height: 24.h),
+            SizedBox(height: 8.h),
             Text(
               'المصروفات الشهرية',
               style: TextStyle(
@@ -59,43 +46,61 @@ class Step4Expenses extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16.h),
-            _buildExpenseRow(context, 'إيجار', rentController, Icons.home_work),
+            _buildExpenseRow(
+              context,
+              'إيجار',
+              rentController,
+              Icons.home_work,
+              false,
+            ),
             _buildExpenseRow(
               context,
               'كهرباء',
               electricityController,
               Icons.electric_bolt,
+              true,
             ),
             _buildExpenseRow(
               context,
               'مياه',
               waterController,
               Icons.water_drop,
+              true,
             ),
             _buildExpenseRow(
               context,
               'غاز',
               gasController,
               Icons.local_fire_department,
+              true,
             ),
             _buildExpenseRow(
               context,
               'تعليم',
               educationController,
               Icons.school,
+              false,
             ),
             _buildExpenseRow(
               context,
               'علاج',
               treatmentController,
               Icons.medical_services,
+              true,
             ),
-            _buildExpenseRow(context, 'ديون', debtController, Icons.money_off),
+            _buildExpenseRow(
+              context,
+              'ديون',
+              debtController,
+              Icons.money_off,
+              false,
+            ),
             _buildExpenseRow(
               context,
               'أخرى',
               otherExpensesController,
               Icons.more_horiz,
+              false,
             ),
           ],
         ),
@@ -108,6 +113,7 @@ class Step4Expenses extends StatelessWidget {
     String label,
     TextEditingController controller,
     IconData icon,
+    bool isRequired,
   ) {
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
@@ -117,8 +123,10 @@ class Step4Expenses extends StatelessWidget {
         hasTextAbove: true,
         hint: '0.0',
         keyboardType: TextInputType.number,
-        prefixIcon: Icon(icon, size: 20.sp),
-        validator: (v) => ValidationUtils.validateAmount(v, required: true),
+        prefixIcon: Icon(icon, size: 20.sp, color: Theme.of(context).primaryColor,),
+        validator: isRequired
+            ? (v) => ValidationUtils.validateAmount(v, required: true)
+            : null,
         textInputAction: TextInputAction.next,
       ),
     );

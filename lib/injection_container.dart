@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/user/di/user_di.dart';
 import 'features/admin/di/admin_di.dart';
+import 'features/donor/di/donor_di.dart';
 
 final sl = GetIt.instance;
 
@@ -18,6 +19,9 @@ Future<void> init() async {
 
   // Features - Admin
   initAdminDI(sl);
+
+  // Features - Donor
+  initDonorDI(sl);
 
   // External
   final sharedPreferences = await SharedPreferences.getInstance();

@@ -9,6 +9,7 @@ import 'core/navigation/routes/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/user/presentation/cubit/user_cases_cubit.dart';
+import 'features/donor/presentation/cubit/donor_cubit.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => di.sl<ThemeCubit>()),
         BlocProvider(create: (_) => di.sl<UserCasesCubit>()),
+        BlocProvider(create: (_) => di.sl<DonorCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, AppThemeMode>(
         builder: (context, themeMode) {

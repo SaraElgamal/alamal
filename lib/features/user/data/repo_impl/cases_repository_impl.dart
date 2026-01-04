@@ -7,6 +7,8 @@ import '../repo/cases_repository.dart';
 import '../../di/cases_service.dart';
 import '../models/case_model.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CasesRepositoryImpl implements CasesRepository {
   final CasesService casesService;
 
@@ -18,7 +20,7 @@ class CasesRepositoryImpl implements CasesRepository {
       await casesService.addCase(caseModel);
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(_handleException(e));
     }
   }
 
@@ -28,7 +30,7 @@ class CasesRepositoryImpl implements CasesRepository {
       final cases = await casesService.getCases();
       return Right(cases);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(_handleException(e));
     }
   }
 
@@ -38,7 +40,7 @@ class CasesRepositoryImpl implements CasesRepository {
       final caseModel = await casesService.getCaseById(id);
       return Right(caseModel);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(_handleException(e));
     }
   }
 
@@ -103,7 +105,7 @@ class CasesRepositoryImpl implements CasesRepository {
 
       return Right(path);
     } catch (e) {
-      return Left(ExcelFailure(e.toString()));
+      return Left(_handleException(e));
     }
   }
 
@@ -113,7 +115,7 @@ class CasesRepositoryImpl implements CasesRepository {
       await casesService.deleteCase(id);
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(_handleException(e));
     }
   }
 
@@ -123,7 +125,20 @@ class CasesRepositoryImpl implements CasesRepository {
       await casesService.deleteAllCases();
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(_handleException(e));
     }
+  }
+
+  Failure _handleException(Object e) {
+    if (e is FirebaseException) {
+      if (e.code == 'unavailable' ||
+          e.code == 'network-request-failed' ||
+          e.code == 'deadline-exceeded') {
+        return const NetworkFailure('لا يوجد اتصال بالانترنت');
+      }
+    } else if (e is SocketException) {
+      return const NetworkFailure('لا يوجد اتصال بالانترنت');
+    }
+    return const ServerFailure('فيه مشكلة حاول ف وقت لاحق');
   }
 }

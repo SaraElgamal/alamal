@@ -6,8 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
-class RegistrationSuccessScreen extends StatelessWidget {
-  const RegistrationSuccessScreen({super.key});
+class DonorSuccessScreen extends StatelessWidget {
+  const DonorSuccessScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,14 +15,13 @@ class RegistrationSuccessScreen extends StatelessWidget {
       body: Stack(
         alignment: Alignment.center,
         children: [
-          // Celebration animation in the background
           Positioned.fill(
             child: Center(
               child: Lottie.asset(
-                height: 500.h,width: 300.h,
+                height: 500.h,
+                width: 300.h,
                 'assets/animation/Success celebration.json',
                 repeat: false,
-                //fit: BoxFit.cover,
               ),
             ),
           ),
@@ -33,7 +32,6 @@ class RegistrationSuccessScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Spacer(),
-                  // Main success animation
                   Lottie.asset(
                     'assets/animation/Success.json',
                     width: 200.w,
@@ -42,7 +40,7 @@ class RegistrationSuccessScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
                   Text(
-                    'تم التسجيل بنجاح!',
+                    'شكراً لعطائك!',
                     style: TextStyle(
                       fontSize: 24.sp,
                       fontWeight: FontWeight.bold,
@@ -52,7 +50,7 @@ class RegistrationSuccessScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 16.h),
                   Text(
-                    'بياناتك تسجلت بنجاح ووصلتنا وإن شاء الله سيتم التواصل معك قريباً',
+                    'تم تسجيل تبرعك بنجاح. جزاك الله خيراً وجعله في ميزان حسناتك',
                     style: TextStyle(
                       fontSize: 18.sp,
                       color: Colors.grey.shade700,
@@ -61,11 +59,10 @@ class RegistrationSuccessScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const Spacer(),
-                  // Facebook link
                   InkWell(
                     onTap: () => UrlLauncherHelper.openUrl(
                       url:
-                          'https://www.facebook.com/alamalaweshelhagar/about?locale=ar_AR', 
+                          'https://www.facebook.com/alamalaweshelhagar/about?locale=ar_AR',
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(8.r),
@@ -91,9 +88,8 @@ class RegistrationSuccessScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 24.h),
-                  // New Registration button
                   LoadingButton(
-                     onTap: () async {
+                    onTap: () async {
                       context.go(AppRoutes.landing);
                     },
                     title: 'العودة للرئيسية',

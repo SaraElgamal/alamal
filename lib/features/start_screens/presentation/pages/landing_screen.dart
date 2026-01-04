@@ -68,7 +68,7 @@ class _LandingScreenState extends State<LandingScreen> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 50.h, right: 16.w, left: 16.w),
+                padding: EdgeInsets.only(top: 20.h, right: 16.w, left: 16.w),
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Row(
@@ -105,92 +105,112 @@ class _LandingScreenState extends State<LandingScreen> {
             ],
           ),
           Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                children: [
-                  SizedBox(height: 10.h),
-                  CardWidget(
-                    height: 50.h,
-                    width: 50.w,
-                    radius: 8.r,
-                    backgroundColor: context.colors.primary5.withValues(
-                      alpha: 0.2,
-                    ),
-                    child: Icon(
-                      Icons.energy_savings_leaf_outlined,
-                      color: context.colors.primary,
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-                  FadeInDown(
-                    delay: const Duration(milliseconds: 200),
-                    child: Text(
-                      'جمعية الأمل',
-                      style: TextStyle(
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.w900,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  children: [
+                    SizedBox(height: 10.h),
+                    CardWidget(
+                      height: 50.h,
+                      width: 50.w,
+                      radius: 8.r,
+                      backgroundColor: context.colors.primary5.withValues(
+                        alpha: 0.2,
+                      ),
+                      child: Icon(
+                        Icons.energy_savings_leaf_outlined,
                         color: context.colors.primary,
-                        height: 1.2,
-                        letterSpacing: -0.5,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  SizedBox(height: 16.h),
-                  FadeInDown(
-                    delay: const Duration(milliseconds: 400),
-                    child: Text(
-                      'معاً نصنع الفرق ونبني مستقبلاً أفضل للجميع بلمسة إنسانية وعطاء لا ينتهي.',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: context.colors.black50,
-                        height: 1.6,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const Spacer(),
-                  FadeInUp(
-                    delay: const Duration(milliseconds: 600),
-                    child: LoadingButton(
-                      onTap: () async {
-                        context.push(AppRoutes.caseRegistration).then((_) {
-                          if (mounted) _checkDraft();
-                        });
-                      },
-                      title: _hasDraft ? 'استكمال البيانات' : 'تسجيل جديد',
-                      customChild: Text(
-                        _hasDraft ? 'استكمال البيانات' : 'تسجيل جديد',
+                    SizedBox(height: 20.h),
+                    FadeInDown(
+                      delay: const Duration(milliseconds: 200),
+                      child: Text(
+                        'جمعية الأمل',
                         style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 15.h),
-                  FadeInUp(
-                    delay: const Duration(milliseconds: 800),
-                    child: LoadingButton(
-                      title: 'دخول الإدارة',
-                      onTap: () async {
-                        await context.push(AppRoutes.adminLogin);
-                      },
-                      color: context.colors.background,
-                      borderSide: BorderSide(color: context.colors.primary),
-                      customChild: Text(
-                        'دخول الإدارة',
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w900,
                           color: context.colors.primary,
+                          height: 1.2,
+                          letterSpacing: -0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    FadeInDown(
+                      delay: const Duration(milliseconds: 400),
+                      child: Text(
+                        'معاً نصنع الفرق ونبني مستقبلاً أفضل للجميع بلمسة إنسانية وعطاء لا ينتهي.',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: context.colors.black50,
+                          height: 1.6,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 600),
+                      child: LoadingButton(
+                        onTap: () async {
+                          context.push(AppRoutes.caseRegistration).then((_) {
+                            if (mounted) _checkDraft();
+                          });
+                        },
+                        title: _hasDraft ? 'استكمال البيانات' : 'تسجيل جديد',
+                        customChild: Text(
+                          _hasDraft ? 'استكمال البيانات' : 'تسجيل جديد',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 40.h),
-                ],
+                    //  SizedBox(height: 10.h),
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 600),
+                      child: LoadingButton(
+                        onTap: () async {
+                          context.push(AppRoutes.donorRegistration);
+                        },
+                        title: 'تسجيل كمتبرع',
+                        customChild: Text(
+                          'تسجيل كمتبرع',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    //  SizedBox(height: 10.h),
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 800),
+                      child: LoadingButton(
+                        title: 'دخول الإدارة',
+                        onTap: () async {
+                          await context.push(AppRoutes.adminLogin);
+                        },
+                        color: context.colors.background,
+                        borderSide: BorderSide(color: context.colors.primary),
+                        customChild: Text(
+                          'دخول الإدارة',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                            color: context.colors.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                  ],
+                ),
               ),
             ),
           ),

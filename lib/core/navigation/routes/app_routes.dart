@@ -14,6 +14,8 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String changePassword = '/change-password';
   static const String biometricSetup = '/biometric-setup';
+  static const String donorRegistration = '/donor-registration';
+  static const String donorSuccess = '/donor-success';
 
   // Feature-specific Routes
 

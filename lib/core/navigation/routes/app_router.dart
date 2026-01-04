@@ -12,6 +12,8 @@ import 'package:charity_app/features/user/data/models/case_model.dart';
 import 'package:charity_app/features/user/presentation/pages/case_details_screen.dart';
 import 'package:charity_app/features/user/presentation/pages/case_registration_screen.dart';
 import 'package:charity_app/features/user/presentation/pages/registration_success_screen.dart';
+import 'package:charity_app/features/donor/presentation/pages/donor_registration_screen.dart';
+import 'package:charity_app/features/donor/presentation/pages/donor_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -84,6 +86,24 @@ class AppRouter {
           context: context,
           state: state,
           child: const RegistrationSuccessScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.donorRegistration,
+        name: 'donorRegistration',
+        pageBuilder: (context, state) => AppTransitions.slideFromRight(
+          context: context,
+          state: state,
+          child: const DonorRegistrationScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.donorSuccess,
+        name: 'donorSuccess',
+        pageBuilder: (context, state) => AppTransitions.slideFromRight(
+          context: context,
+          state: state,
+          child: const DonorSuccessScreen(),
         ),
       ),
       GoRoute(

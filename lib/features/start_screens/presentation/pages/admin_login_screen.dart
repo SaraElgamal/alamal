@@ -1,6 +1,10 @@
+import 'package:animate_do/animate_do.dart';
+import 'package:charity_app/core/config/res/color_manager.dart';
 import 'package:charity_app/core/helpers/biometric_helper.dart';
+import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:charity_app/core/navigation/routes/app_routes.dart';
 import 'package:charity_app/core/widgets/buttons/loading_button.dart';
+import 'package:charity_app/core/widgets/card_widget.dart';
 import 'package:charity_app/core/widgets/custom_messages.dart';
 import 'package:charity_app/core/widgets/custom_text_form_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -131,44 +135,103 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(title: const Text('دخول الإدارة')),
       body: Padding(
         padding: EdgeInsets.all(16.w),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CustomTextFormField(
-                label: 'البريد الإلكتروني',
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                validator: _validateEmail,
-              ),
-              CustomTextFormField(
-                label: 'كلمة المرور',
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                validator: _validatePassword,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: 300.w,
+                    height: 220.h,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
                 ),
-              ),
-              SizedBox(height: 24.h),
-              LoadingButton(
-                title: 'دخول',
-                onTap: () => _login(),
-                borderRadius: 8.r,
-                height: 50.h,
-              ),
-            ],
+                FadeInDown(
+                  delay: const Duration(milliseconds: 200),
+                  child: Text(
+                    ' مرحبا بك !\n سجل دخولك إلى الإدارة ',
+                    style: TextStyle(
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.w800,
+          
+                      color: context.colors.textSubtle,
+                      height: 1.5,
+                      letterSpacing: -0.5,
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                CustomTextFormField(
+                  label: 'البريد الإلكتروني',
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: _validateEmail,
+                ),
+                CustomTextFormField(
+                  label: 'كلمة المرور',
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  validator: _validatePassword,
+                  suffixIcon: InkWell(
+                    child: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(height: 32.h),
+                FadeInUp(
+                  delay: const Duration(milliseconds: 200),
+                  child: Center(
+                    child: LoadingButton(
+                      margin: EdgeInsets.zero,
+                      title: 'دخول',
+                      onTap: () => _login(),
+                      height: 50.h,
+                    ),
+                  ),
+                ),
+                 SizedBox(height: 20.h),
+                 FadeInDown(
+                  delay: const Duration(milliseconds: 200),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 18.sp,
+                        color: context.colors.primary,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        ' هذا الجزء خاص بأعضاء جمعية الأمل فقط',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: context.colors.primary,
+                          height: 1.2,
+                          letterSpacing: -0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+               
+               
+              ],
+            ),
           ),
         ),
       ),

@@ -65,13 +65,15 @@ class _BiometricSetupScreenState extends State<BiometricSetupScreen> {
                 color: context.colors.primary,
               ),
               SizedBox(height: 50.h),
-              LoadingButton(
-                title: 'تفعيل الآن',
-                onTap: _enableBiometric,
-                color: context.colors.primary,
-                textColor: Colors.white,
-                borderRadius: AppRadius.bR12,
-                height: 50.h,
+              Center(
+                child: LoadingButton(
+                  title: 'تفعيل الآن',
+                  onTap: _enableBiometric,
+                  color: context.colors.primary,
+                  textColor: Colors.white,
+                  borderRadius: AppRadius.bR12,
+                  height: 50.h,
+                ),
               ),
               SizedBox(height: 16.h),
               TextButton(

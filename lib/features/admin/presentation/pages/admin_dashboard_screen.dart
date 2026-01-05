@@ -6,7 +6,6 @@ import 'package:charity_app/core/widgets/card_widget.dart';
 import 'package:charity_app/core/widgets/custom_app_header.dart';
 import 'package:charity_app/core/widgets/custom_dialog.dart';
 import 'package:charity_app/core/widgets/custom_messages.dart';
-import 'package:charity_app/core/widgets/custom_status_widget.dart';
 import 'package:charity_app/core/widgets/custom_loading.dart';
 import 'package:charity_app/core/widgets/empty_widget.dart';
 import 'package:charity_app/core/widgets/text_form_filed_widget.dart';
@@ -35,6 +34,8 @@ class AdminDashboardScreen extends StatefulWidget {
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  AdminCasesCubit? _cubit;
 
   @override
   void initState() {
@@ -50,8 +51,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   void _onScroll() {
-    if (_isBottom) {
-      context.read<AdminCasesCubit>().loadMoreCases();
+    if (_isBottom && _cubit != null) {
+      _cubit!.loadMoreCases();
     }
   }
 
@@ -65,17 +66,25 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => di.sl<AdminCasesCubit>()..loadCases(),
+      create: (context) {
+        _cubit = di.sl<AdminCasesCubit>()..loadCases();
+        return _cubit!;
+      },
       child: Builder(
         builder: (context) {
           return Scaffold(
+            key: _scaffoldKey,
             backgroundColor: context.colors.scaffoldBackground,
             drawer: _buildDrawer(context),
             body: Column(
               children: [
                 CustomAppHeader(
-                  title: 'لوحة التحكم',
+                  title: 'إدارة الجمعية',
                   showBackButton: false,
+                  leading: IconButton(
+                    icon: const Icon(Icons.menu, color: Colors.white),
+                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  ),
                   actions: [
                     IconButton(
                       icon: const Icon(
@@ -91,12 +100,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       onPressed: () {
                         context.read<AdminCasesCubit>().exportToExcel();
                       },
-                    ),
-                    Builder(
-                      builder: (context) => IconButton(
-                        icon: const Icon(Icons.menu, color: Colors.white),
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                      ),
                     ),
                   ],
                 ),
@@ -179,15 +182,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          UserAccountsDrawerHeader(
-            accountName: Text(user?.displayName ?? 'Admin User'),
-            accountEmail: Text(user?.email ?? 'admin@charity.com'),
-            currentAccountPicture: const CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.person, size: 40),
-            ),
-            decoration: BoxDecoration(color: context.colors.primary),
-          ),
+          // UserAccountsDrawerHeader(
+          //   accountName: Text(''),
+          //   accountEmail: Text(user?.email ?? 'admin@charity.com'),
+          //   // currentAccountPicture: const CircleAvatar(
+          //   //   backgroundColor: Colors.white,
+          //   //   child: Icon(Icons.person, size: 40),
+          //   // ),
+          //   decoration: BoxDecoration(color: context.colors.primary),
+          // ),
           ListTile(
             leading: const Icon(Icons.person_outline),
             title: const Text('الملف الشخصي'),
@@ -196,21 +199,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               context.push(AppRoutes.profile);
             },
           ),
-          BlocBuilder<ThemeCubit, AppThemeMode>(
-            builder: (context, themeMode) {
-              final isDark = themeMode == AppThemeMode.dark;
-              return ListTile(
-                leading: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
-                title: Text(isDark ? 'الوضع الداكن' : 'الوضع الفاتح'),
-                trailing: Switch(
-                  value: isDark,
-                  onChanged: (value) {
-                    context.read<ThemeCubit>().toggleTheme();
-                  },
-                ),
-              );
-            },
-          ),
+          // BlocBuilder<ThemeCubit, AppThemeMode>(
+          //   builder: (context, themeMode) {
+          //     final isDark = themeMode == AppThemeMode.dark;
+          //     return ListTile(
+          //       leading: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+          //       title: Text(isDark ? 'الوضع الداكن' : 'الوضع الفاتح'),
+          //       trailing: Switch(
+          //         value: isDark,
+          //         onChanged: (value) {
+          //           context.read<ThemeCubit>().toggleTheme();
+          //         },
+          //       ),
+          //     );
+          //   },
+          // ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
@@ -275,8 +278,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _buildCaseCard(BuildContext context, admin_model.CaseModel caseItem) {
+    // Determine if case is urgent
+    final totalIncome = caseItem.manualTotalFamilyIncome;
+    final totalExpenses = caseItem.expenses.total;
+    final remaining = totalIncome - totalExpenses;
+    final isUrgent = remaining < 0 || totalIncome < 2000;
+    final isCritical = remaining < -500 || totalIncome < 1000;
+
     return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.only(bottom: 12.h),
       child: CardWidget(
         padding: EdgeInsets.all(16.w),
         isShadow: true,
@@ -287,72 +297,114 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               extra: {'case': _mapToUserCaseModel(caseItem), 'showEdit': true},
             );
           },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          borderRadius: BorderRadius.circular(12.r),
+          child: Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      caseItem.applicant.name,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.colors.primary,
-                        fontSize: 16.sp,
-                      ),
-                    ),
+              // Urgent Indicator
+              if (isUrgent)
+                Container(
+                  width: 4.w,
+                  height: 50.h,
+                  decoration: BoxDecoration(
+                    color: isCritical ? Colors.red : Colors.orange,
+                    borderRadius: BorderRadius.circular(2.r),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.delete_outline,
-                      color: context.colors.error,
+                ),
+              if (isUrgent) SizedBox(width: 12.w),
+
+              // Main Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name with urgent badge
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            caseItem.applicant.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: context.colors.primary,
+                              fontSize: 15.sp,
+                            ),
+                          ),
+                        ),
+                        if (isUrgent)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6.w,
+                              vertical: 2.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isCritical ? Colors.red : Colors.orange,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                            child: Text(
+                              isCritical ? 'عاجل' : 'متابعة',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    onPressed: () => _confirmDeleteCase(context, caseItem),
-                  ),
-                ],
+                    SizedBox(height: 8.h),
+
+                    // National ID
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.credit_card,
+                          size: 14.sp,
+                          color: context.colors.textSubtle,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          caseItem.applicant.nationalId,
+                          style: TextStyle(
+                            color: context.colors.textSubtle,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4.h),
+
+                    // Phone
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.phone,
+                          size: 14.sp,
+                          color: context.colors.textSubtle,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          caseItem.applicant.phone,
+                          style: TextStyle(
+                            color: context.colors.textSubtle,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 8.h),
-              Row(
-                children: [
-                  Icon(
-                    Icons.credit_card,
-                    size: 16.sp,
-                    color: context.colors.textSubtle,
-                  ),
-                  SizedBox(width: 4.w),
-                  Text(
-                    caseItem.applicant.nationalId,
-                    style: TextStyle(
-                      color: context.colors.textSubtle,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 4.h),
-              Row(
-                children: [
-                  Icon(
-                    Icons.phone,
-                    size: 16.sp,
-                    color: context.colors.textSubtle,
-                  ),
-                  SizedBox(width: 4.w),
-                  Text(
-                    caseItem.applicant.phone,
-                    style: TextStyle(
-                      color: context.colors.textSubtle,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.h),
-              CustomStatusWidget(
-                title: caseItem.caseDescription,
-                backgroundColor: context.colors.primary.withValues(alpha: 0.1),
-                titleColor: context.colors.primary,
+
+              // Delete Button
+              IconButton(
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: context.colors.error,
+                  size: 20.sp,
+                ),
+                onPressed: () => _confirmDeleteCase(context, caseItem),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
             ],
           ),
@@ -360,6 +412,223 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       ),
     );
   }
+  //   // Determine if case is urgent
+  //   final totalIncome = caseItem.manualTotalFamilyIncome;
+  //   final totalExpenses = caseItem.expenses.total;
+  //   final remaining = totalIncome - totalExpenses;
+  //   final isUrgent = remaining < 0 || totalIncome < 2000;
+  //   final isCritical = remaining < -500 || totalIncome < 1000;
+
+  //   return Padding(
+  //     padding: EdgeInsets.only(bottom: 16.h),
+  //     child: CardWidget(
+  //       padding: EdgeInsets.zero,
+  //       isShadow: true,
+  //       child: InkWell(
+  //         onTap: () {
+  //           context.push(
+  //             AppRoutes.caseDetails,
+  //             extra: {'case': _mapToUserCaseModel(caseItem), 'showEdit': true},
+  //           );
+  //         },
+  //         borderRadius: BorderRadius.circular(12.r),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             // Header with urgent badge
+  //             Container(
+  //               padding: EdgeInsets.all(16.w),
+  //               decoration: BoxDecoration(
+  //                 color: isCritical
+  //                     ? Colors.red.withValues(alpha: 0.1)
+  //                     : isUrgent
+  //                     ? Colors.orange.withValues(alpha: 0.1)
+  //                     : Colors.green.withValues(alpha: 0.05),
+  //                 borderRadius: BorderRadius.only(
+  //                   topLeft: Radius.circular(12.r),
+  //                   topRight: Radius.circular(12.r),
+  //                 ),
+  //               ),
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Row(
+  //                     children: [
+  //                       // Urgent Badge
+  //                       if (isUrgent)
+  //                         Container(
+  //                           padding: EdgeInsets.symmetric(
+  //                             horizontal: 8.w,
+  //                             vertical: 4.h,
+  //                           ),
+  //                           decoration: BoxDecoration(
+  //                             color: isCritical ? Colors.red : Colors.orange,
+  //                             borderRadius: BorderRadius.circular(20.r),
+  //                           ),
+  //                           child: Row(
+  //                             mainAxisSize: MainAxisSize.min,
+  //                             children: [
+  //                               Icon(
+  //                                 isCritical
+  //                                     ? Icons.report_problem
+  //                                     : Icons.warning,
+  //                                 color: Colors.white,
+  //                                 size: 14.sp,
+  //                               ),
+  //                               SizedBox(width: 4.w),
+  //                               Text(
+  //                                 isCritical ? 'عاجل جداً' : 'يحتاج متابعة',
+  //                                 style: TextStyle(
+  //                                   color: Colors.white,
+  //                                   fontSize: 11.sp,
+  //                                   fontWeight: FontWeight.bold,
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       Expanded(
+  //                         child: Text(
+  //                           caseItem.applicant.name,
+  //                           style: TextStyle(
+  //                             fontWeight: FontWeight.bold,
+  //                             color: context.colors.primary,
+  //                             fontSize: 16.sp,
+  //                           ),
+  //                           textAlign: isUrgent
+  //                               ? TextAlign.left
+  //                               : TextAlign.right,
+  //                         ),
+  //                       ),
+  //                       IconButton(
+  //                         icon: Icon(
+  //                           Icons.delete_outline,
+  //                           color: context.colors.error,
+  //                           size: 20.sp,
+  //                         ),
+  //                         onPressed: () =>
+  //                             _confirmDeleteCase(context, caseItem),
+  //                         padding: EdgeInsets.zero,
+  //                         constraints: const BoxConstraints(),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+
+  //             // Body with details
+  //             Padding(
+  //               padding: EdgeInsets.all(16.w),
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   // Quick Info Chips
+  //                   Wrap(
+  //                     spacing: 8.w,
+  //                     runSpacing: 8.h,
+  //                     children: [
+  //                       _buildInfoChip(
+  //                         context,
+  //                         icon: Icons.credit_card,
+  //                         label: caseItem.applicant.nationalId,
+  //                       ),
+  //                       _buildInfoChip(
+  //                         context,
+  //                         icon: Icons.phone,
+  //                         label: caseItem.applicant.phone,
+  //                       ),
+  //                       _buildInfoChip(
+  //                         context,
+  //                         icon: Icons.groups,
+  //                         label:
+  //                             '${caseItem.familyMembers.length + 1 + (caseItem.spouse != null ? 1 : 0)} أفراد',
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   SizedBox(height: 12.h),
+
+  //                   // Case Description
+  //                   Container(
+  //                     padding: EdgeInsets.all(12.w),
+  //                     decoration: BoxDecoration(
+  //                       color: context.colors.primary.withValues(alpha: 0.05),
+  //                       borderRadius: BorderRadius.circular(8.r),
+  //                       border: Border.all(
+  //                         color: context.colors.primary.withValues(alpha: 0.2),
+  //                       ),
+  //                     ),
+  //                     child: Row(
+  //                       children: [
+  //                         Icon(
+  //                           Icons.description,
+  //                           size: 16.sp,
+  //                           color: context.colors.primary,
+  //                         ),
+  //                         SizedBox(width: 8.w),
+  //                         Expanded(
+  //                           child: Text(
+  //                             caseItem.caseDescription,
+  //                             style: TextStyle(
+  //                               fontSize: 13.sp,
+  //                               color: context.colors.text,
+  //                             ),
+  //                             maxLines: 2,
+  //                             overflow: TextOverflow.ellipsis,
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                   SizedBox(height: 12.h),
+
+  //                   // Financial Summary
+  //                   Row(
+  //                     children: [
+  //                       Expanded(
+  //                         child: _buildFinancialInfo(
+  //                           context,
+  //                           icon: Icons.trending_up,
+  //                           label: 'الدخل',
+  //                           value: _formatCurrencyShort(totalIncome),
+  //                           color: Colors.green,
+  //                         ),
+  //                       ),
+  //                       SizedBox(width: 8.w),
+  //                       Expanded(
+  //                         child: _buildFinancialInfo(
+  //                           context,
+  //                           icon: Icons.trending_down,
+  //                           label: 'المصروفات',
+  //                           value: _formatCurrencyShort(totalExpenses),
+  //                           color: Colors.orange,
+  //                         ),
+  //                       ),
+  //                       SizedBox(width: 8.w),
+  //                       Expanded(
+  //                         child: _buildFinancialInfo(
+  //                           context,
+  //                           icon: remaining >= 0
+  //                               ? Icons.check_circle
+  //                               : Icons.warning,
+  //                           label: remaining >= 0 ? 'فائض' : 'عجز',
+  //                           value: _formatCurrencyShort(remaining.abs()),
+  //                           color: remaining >= 0 ? Colors.green : Colors.red,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+
 
   void _confirmDeleteCase(
     BuildContext context,

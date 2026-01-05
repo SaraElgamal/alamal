@@ -19,6 +19,7 @@ class CustomAppHeader extends StatelessWidget {
     this.backColor,
     this.backMargin,
     this.actions,
+    this.leading,
     this.showBackButton = true,
   });
 
@@ -30,6 +31,7 @@ class CustomAppHeader extends StatelessWidget {
   final EdgeInsets? backMargin;
   final List<Widget>? actions;
   final bool showBackButton;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +48,12 @@ class CustomAppHeader extends StatelessWidget {
                 bottomStart: Radius.circular(AppRadius.bR10),
                 bottomEnd: Radius.circular(AppRadius.bR10),
               ),
-              image: DecorationImage(
-                image: ExactAssetImage(
-                  vectorPath ?? 'assets/images/appbar.png',
-                ),
-                fit: BoxFit.cover,
-              ),
+              // image: DecorationImage(
+              //   image: ExactAssetImage(
+              //     vectorPath ?? 'assets/images/appbar.png',
+              //   ),
+              //   fit: BoxFit.cover,
+              // ),
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(
@@ -60,6 +62,17 @@ class CustomAppHeader extends StatelessWidget {
                 Stack(
                   alignment: Alignment.center,
                   children: [
+                    if (leading != null)
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: GestureDetector(
+                          onTap: onBack ?? () => Navigator.pop(context),
+                          child: Padding(
+                            padding:  EdgeInsets.symmetric(horizontal: 10.0.w),
+                            child: leading,
+                          ),
+                        ),
+                      ),
                     if (showBackButton)
                       Align(
                         alignment: AlignmentDirectional.centerStart,
@@ -68,7 +81,8 @@ class CustomAppHeader extends StatelessWidget {
                           child: Container(
                             width: backWidth ?? AppSize.sW40,
                             height: backHeight ?? AppSize.sW40,
-                            margin: backMargin ??
+                            margin:
+                                backMargin ??
                                 const EdgeInsetsDirectional.fromSTEB(
                                   16,
                                   12,
@@ -77,8 +91,9 @@ class CustomAppHeader extends StatelessWidget {
                                 ),
                             decoration: BoxDecoration(
                               color: backColor ?? context.colors.transparent,
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.bR10),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.bR10,
+                              ),
                             ),
                             child: Center(
                               child: Icon(
@@ -102,14 +117,13 @@ class CustomAppHeader extends StatelessWidget {
                                 .textTheme
                                 .headlineMedium
                                 ?.copyWith(
-                                    color: context.colors.white,
-                                    fontSize: 17.sp,
-                                    fontWeight: FontWeight.w500),
+                                  color: context.colors.white,
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
                           ),
                         ),
-                        if (actions != null) ...[
-                          ...actions!,
-                        ]
+                        if (actions != null) ...[...actions!],
                       ],
                     ),
                   ],

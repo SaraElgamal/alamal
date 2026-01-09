@@ -1,5 +1,9 @@
 import 'package:charity_app/core/navigation/routes/slider_transition.dart';
 import 'package:charity_app/features/admin/presentation/pages/admin_dashboard_screen.dart';
+import 'package:charity_app/features/admin/presentation/pages/cases_list_screen.dart';
+import 'package:charity_app/features/admin/data/models/donation_model.dart';
+import 'package:charity_app/features/admin/presentation/pages/donation_details_screen.dart';
+import 'package:charity_app/features/admin/presentation/pages/donations_list_screen.dart';
 import 'package:charity_app/features/admin/presentation/pages/change_password_screen.dart';
 import 'package:charity_app/features/admin/presentation/pages/edit_case_screen.dart';
 import 'package:charity_app/features/admin/presentation/pages/profile_screen.dart';
@@ -20,6 +24,8 @@ import 'package:go_router/go_router.dart';
 import '../navigation.dart';
 
 class AppRouter {
+  static const String donationDetails = '/donation-details';
+  static const String profile = '/profile';
   static final GoRouter router = GoRouter(
     navigatorKey: NavigationService.navigatorKey,
     initialLocation: AppRoutes.splash,
@@ -69,6 +75,36 @@ class AppRouter {
           state: state,
           child: const AdminDashboardScreen(),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.casesList,
+        name: 'casesList',
+        pageBuilder: (context, state) => AppTransitions.slideFromRight(
+          context: context,
+          state: state,
+          child: const CasesListScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.donationsList,
+        name: 'donationsList',
+        pageBuilder: (context, state) => AppTransitions.slideFromRight(
+          context: context,
+          state: state,
+          child: const DonationsListScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.donationDetails,
+        name: 'donationDetails',
+        pageBuilder: (context, state) {
+          final donation = state.extra as DonationModel;
+          return AppTransitions.slideFromRight(
+            context: context,
+            state: state,
+            child: DonationDetailsScreen(donation: donation),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.caseRegistration,

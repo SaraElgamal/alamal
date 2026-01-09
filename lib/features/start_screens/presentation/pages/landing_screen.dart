@@ -4,6 +4,7 @@ import 'package:charity_app/core/helpers/context_extension.dart';
 import 'package:charity_app/core/navigation/routes/app_routes.dart';
 import 'package:charity_app/core/widgets/buttons/loading_button.dart';
 import 'package:charity_app/core/widgets/card_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -194,7 +195,13 @@ class _LandingScreenState extends State<LandingScreen> {
                       child: LoadingButton(
                         title: 'دخول الإدارة',
                         onTap: () async {
-                          await context.push(AppRoutes.adminLogin);
+                          if (FirebaseAuth.instance.currentUser != null) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              context.go(AppRoutes.adminDashboard);
+                            });
+                          } else {
+                            await context.push(AppRoutes.adminLogin);
+                          }
                         },
                         color: context.colors.background,
                         borderSide: BorderSide(color: context.colors.primary),

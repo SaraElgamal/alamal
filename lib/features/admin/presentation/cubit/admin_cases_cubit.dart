@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:charity_app/core/helpers/excel_helper.dart';
 import '../../data/models/case_model.dart';
 import '../../data/repo/cases_repository.dart';
 import 'admin_cases_state.dart';
@@ -16,10 +17,11 @@ class AdminCasesCubit extends Cubit<AdminCasesState> {
         cases: [],
         filteredCases: [],
         hasReachedMax: false,
-        isLoadingMore: false,
       ),
     );
-    final result = await casesRepository.getCases(limit: 20);
+    final result = await casesRepository.getCases(
+      limit: 50,
+    ); // Increased limit for better filtering
     result.fold(
       (failure) => emit(
         state.copyWith(
@@ -31,7 +33,7 @@ class AdminCasesCubit extends Cubit<AdminCasesState> {
         state.copyWith(
           status: AdminCasesStatus.success,
           cases: cases,
-          hasReachedMax: cases.length < 20,
+          hasReachedMax: cases.length < 50,
         ),
       ),
     );
@@ -64,168 +66,223 @@ class AdminCasesCubit extends Cubit<AdminCasesState> {
     );
   }
 
-  void filterCases({String? maritalStatus, bool? sortByLowestIncome}) {
+  // --- Advanced Filter Method ---
+  void filterCasesAdvanced({
+    String? maritalStatus,
+    bool? sortByLowestIncome,
+    double? minIncome,
+    double? maxIncome,
+    int? minFamilyMembers,
+    bool? showUrgentOnly,
+    bool? hasAid,
+    bool? hasChildren,
+  }) {
+    // We cannot use copyWith because it ignores nulls (which we need for resetting filters).
+    // So we construct a new state preserving non-filter properties and applying new specific filters.
     emit(
-      state.copyWith(
+      AdminCasesState(
+        status: state.status,
+        cases: state.cases,
+        filteredCases: state.filteredCases, // Will be updated in _applyFilters
+        errorMessage: state.errorMessage,
+        successMessage: state.successMessage,
+        deleteSuccessMessage: state.deleteSuccessMessage,
+        hasReachedMax: state.hasReachedMax,
+        isLoadingMore: state.isLoadingMore,
+        excelPath: state.excelPath,
+        // Apply Filters
+        isFiltering: true,
         filterMaritalStatus: maritalStatus,
         filterSortByLowestIncome: sortByLowestIncome,
-        isFiltering: true,
+        filterMinIncome: minIncome,
+        filterMaxIncome: maxIncome,
+        filterMinFamilyMembers: minFamilyMembers,
+        filterShowUrgentOnly: showUrgentOnly ?? false,
+        filterHasAid: hasAid,
+        filterHasChildren: hasChildren,
       ),
     );
     _applyFilters();
   }
 
+  void clearFilter() {
+    emit(
+      AdminCasesState(
+        status: state.status,
+        cases: state.cases,
+        filteredCases: [],
+        errorMessage: state.errorMessage,
+        successMessage: state.successMessage,
+        deleteSuccessMessage: state.deleteSuccessMessage,
+        hasReachedMax: state.hasReachedMax,
+        isLoadingMore: state.isLoadingMore,
+        excelPath: state.excelPath,
+        // Reset Filters
+        isFiltering: false,
+        filterMaritalStatus: null,
+        filterSortByLowestIncome: false,
+        filterMinIncome: null,
+        filterMaxIncome: null,
+        filterMinFamilyMembers: null,
+        filterShowUrgentOnly: false,
+        filterHasAid: null,
+        filterHasChildren: null,
+      ),
+    );
+  }
+
   void _applyFilters() {
     List<CaseModel> filtered = List.from(state.cases);
 
+    // 1. Marital Status
     if (state.filterMaritalStatus != null) {
+      if (state.filterMaritalStatus == 'متزوج') {
+        filtered = filtered.where((c) => c.spouse != null).toList();
+      } else {
+        filtered = filtered.where((c) => c.spouse == null).toList();
+      }
+    }
+
+    // 2. Income Range
+    if (state.filterMinIncome != null) {
+      filtered = filtered
+          .where((c) => c.manualTotalFamilyIncome >= state.filterMinIncome!)
+          .toList();
+    }
+    if (state.filterMaxIncome != null) {
+      filtered = filtered
+          .where((c) => c.manualTotalFamilyIncome <= state.filterMaxIncome!)
+          .toList();
+    }
+
+    // 3. Family Members
+    if (state.filterMinFamilyMembers != null) {
+      filtered = filtered
+          .where((c) => c.familyMembers.length >= state.filterMinFamilyMembers!)
+          .toList();
+    }
+
+    // 4. Urgent Only
+    if (state.filterShowUrgentOnly == true) {
       filtered = filtered.where((c) {
-        if (state.filterMaritalStatus == 'متزوج') {
-          return c.spouse != null;
-        } else if (state.filterMaritalStatus == 'أعزب' ||
-            state.filterMaritalStatus == 'أرمل' ||
-            state.filterMaritalStatus == 'مطلق') {
-          return c.spouse == null;
-        }
-        return true;
+        final totalIncome = c.manualTotalFamilyIncome;
+        final totalExpenses = c.expenses.total;
+        final remaining = totalIncome - totalExpenses;
+        return remaining < 0 || totalIncome < 2000;
       }).toList();
     }
 
+    // 5. Has Aid
+    if (state.filterHasAid != null) {
+      if (state.filterHasAid == true) {
+        filtered = filtered.where((c) => c.aidHistory.isNotEmpty).toList();
+      } else {
+        filtered = filtered.where((c) => c.aidHistory.isEmpty).toList();
+      }
+    }
+
+    // 6. Has Children
+    if (state.filterHasChildren != null) {
+      if (state.filterHasChildren == true) {
+        filtered = filtered.where((c) => c.familyMembers.isNotEmpty).toList();
+      } else {
+        filtered = filtered.where((c) => c.familyMembers.isEmpty).toList();
+      }
+    }
+
+    // 5. Sorting
     if (state.filterSortByLowestIncome == true) {
       filtered.sort(
-        (a, b) => a.calculatedTotalFamilyIncome.compareTo(
-          b.calculatedTotalFamilyIncome,
-        ),
+        (a, b) =>
+            a.manualTotalFamilyIncome.compareTo(b.manualTotalFamilyIncome),
       );
     }
 
     emit(state.copyWith(filteredCases: filtered));
   }
 
-  Future<void> addNewCase(CaseModel caseModel) async {
-    emit(state.copyWith(status: AdminCasesStatus.loading));
-    final result = await casesRepository.addCase(caseModel);
-    result.fold(
-      (failure) => emit(
+  Stream<double> exportToExcelChange() {
+    final listToExport = state.isFiltering ? state.filteredCases : state.cases;
+    return ExcelHelper.exportCasesWithProgress(
+      listToExport,
+      onComplete: (path) => emit(
         state.copyWith(
-          status: AdminCasesStatus.error,
-          errorMessage: failure.message,
-        ),
-      ),
-      (_) {
-        emit(state.copyWith(successMessage: 'Case added successfully'));
-        loadCases();
-      },
-    );
-  }
-
-  Future<void> updateCase(CaseModel caseModel) async {
-    emit(state.copyWith(status: AdminCasesStatus.loading));
-    final result = await casesRepository.updateCase(caseModel);
-    result.fold(
-      (failure) => emit(
-        state.copyWith(
-          status: AdminCasesStatus.error,
-          errorMessage: failure.message,
-        ),
-      ),
-      (_) {
-        // Update the specific case in the list to avoid full reload if possible,
-        // or just reload. Reloading is safer for consistency.
-        // But let's try to update locally for better UX.
-        final updatedCases = state.cases.map((c) {
-          return c.id == caseModel.id ? caseModel : c;
-        }).toList();
-
-        emit(
-          state.copyWith(
-            status: AdminCasesStatus.success,
-            cases: updatedCases,
-            successMessage: 'Case updated successfully',
-          ),
-        );
-        _applyFilters();
-      },
-    );
-  }
-
-  Future<void> exportToExcel() async {
-    emit(state.copyWith(status: AdminCasesStatus.loading));
-    final result = await casesRepository.exportCasesToExcel();
-    result.fold(
-      (failure) => emit(
-        state.copyWith(
-          status: AdminCasesStatus.error,
-          errorMessage: failure.message,
-        ),
-      ),
-      (path) => emit(
-        state.copyWith(
-          status: AdminCasesStatus.excelExported,
+          successMessage: 'تم التصدير: $path',
           excelPath: path,
-          successMessage: 'Excel exported to $path',
+          status: AdminCasesStatus.excelExported,
         ),
+      ),
+      onError: (err) => emit(
+        state.copyWith(errorMessage: err, status: AdminCasesStatus.error),
       ),
     );
   }
 
   Future<void> deleteCase(String id) async {
-    emit(state.copyWith(status: AdminCasesStatus.loading));
     final result = await casesRepository.deleteCase(id);
-    result.fold(
-      (failure) => emit(
-        state.copyWith(
-          status: AdminCasesStatus.error,
-          errorMessage: failure.message,
-        ),
-      ),
-      (_) {
-        final updatedCases = state.cases
-            .where((element) => element.id != id)
-            .toList();
-        emit(
-          state.copyWith(
-            status: AdminCasesStatus.success,
-            cases: updatedCases,
-            deleteSuccessMessage: 'Case deleted successfully',
-          ),
-        );
-        _applyFilters();
-      },
-    );
+    result.fold((l) => emit(state.copyWith(errorMessage: l.message)), (r) {
+      final updated = state.cases.where((c) => c.id != id).toList();
+      emit(state.copyWith(cases: updated, deleteSuccessMessage: 'تم الحذف'));
+      _applyFilters();
+    });
   }
 
   Future<void> deleteAllCases() async {
-    emit(state.copyWith(status: AdminCasesStatus.loading));
     final result = await casesRepository.deleteAllCases();
     result.fold(
-      (failure) => emit(
+      (l) => emit(state.copyWith(errorMessage: l.message)),
+      (r) => emit(
         state.copyWith(
-          status: AdminCasesStatus.error,
-          errorMessage: failure.message,
-        ),
-      ),
-      (_) => emit(
-        state.copyWith(
-          status: AdminCasesStatus.success,
           cases: [],
           filteredCases: [],
-          deleteSuccessMessage: 'All cases deleted successfully',
+          deleteSuccessMessage: 'تم حذف الجميع',
         ),
       ),
     );
   }
 
   void searchCases(String query) {
+    // Allow searching within filtered results or global? Use global for now
     if (query.isEmpty) {
-      emit(state.copyWith(isFiltering: false, filteredCases: []));
+      _applyFilters();
       return;
     }
-    final filtered = state.cases.where((c) {
-      return c.applicant.name.toLowerCase().contains(query.toLowerCase()) ||
-          c.applicant.nationalId.contains(query) ||
-          c.applicant.phone.contains(query);
-    }).toList();
-    emit(state.copyWith(isFiltering: true, filteredCases: filtered));
+
+    final source = state.cases;
+    final result = source
+        .where(
+          (c) =>
+              c.applicant.name.toLowerCase().contains(query.toLowerCase()) ||
+              c.applicant.nationalId.contains(query),
+        )
+        .toList();
+
+    emit(state.copyWith(isFiltering: true, filteredCases: result));
+  }
+
+  Future<void> updateCase(CaseModel updatedCase) async {
+    emit(state.copyWith(status: AdminCasesStatus.loading));
+    final result = await casesRepository.updateCase(updatedCase);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: AdminCasesStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+      (success) {
+        final updatedList = state.cases
+            .map((c) => c.id == updatedCase.id ? updatedCase : c)
+            .toList();
+        emit(
+          state.copyWith(
+            status: AdminCasesStatus.success,
+            cases: updatedList,
+            successMessage: 'Case updated successfully',
+          ),
+        );
+        _applyFilters();
+      },
+    );
   }
 }

@@ -56,19 +56,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await user.verifyBeforeUpdateEmail(_emailController.text);
         if (mounted) {
           MessageUtils.showSuccess(
-            'تم إرسال رابط التحقق إلى البريد الإلكتروني الجديد',
             context: context,
+            'تم إرسال رابط تفعيل إلى البريد الجديد. يرجى الضغط عليه لتأكيد التغيير.',
           );
         }
         hasChanges = true;
       }
 
       if (mounted) {
-        if (hasChanges) {
-          MessageUtils.showSuccess('تم تحديث البيانات بنجاح', context: context);
-        } else {
-          MessageUtils.showSuccess('لم يتم إجراء أي تغييرات', context: context);
+        if (_nameController.text != user.displayName) {
+          MessageUtils.showSuccess('تم تحديث الاسم بنجاح', context: context);
         }
+        // Don't show generic "updated successfully" if only email changed, as it's pending.
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
@@ -118,6 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: 'البريد الإلكتروني',
                       prefixIcon: const Icon(Icons.email_outlined),
                       keyboardType: TextInputType.emailAddress,
+                      enabled: false,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'مطلوب';
@@ -161,6 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 40.h),
                     LoadingButton(
+                      margin: EdgeInsets.zero,
                       title: 'حفظ التغييرات',
                       onTap: _updateProfile,
                       color: context.colors.primary,

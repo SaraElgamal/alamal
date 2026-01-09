@@ -22,6 +22,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  bool _obscureCurrent = true;
+  bool _obscureNew = true;
+  bool _obscureConfirm = true;
+
   @override
   void dispose() {
     _currentPasswordController.dispose();
@@ -55,7 +59,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
-        String message = 'حدث خطأ ما';
+        String message = 'حدث خطأ يرجى ادخال كلمة السر القديمه بشكل صحيح والمحاولة مره اخرى';
         if (e.code == 'wrong-password') {
           message = 'كلمة المرور الحالية غير صحيحة';
         } else if (e.code == 'weak-password') {
@@ -93,7 +97,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       controller: _currentPasswordController,
                       label: 'كلمة المرور الحالية',
                       prefixIcon: const Icon(Icons.lock_outline),
-                      isPassword: true,
+                      isPassword: _obscureCurrent,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureCurrent
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () =>
+                            setState(() => _obscureCurrent = !_obscureCurrent),
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'مطلوب';
@@ -106,7 +119,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       controller: _newPasswordController,
                       label: 'كلمة المرور الجديدة',
                       prefixIcon: const Icon(Icons.lock_outline),
-                      isPassword: true,
+                      isPassword: _obscureNew,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureNew ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        onPressed: () =>
+                            setState(() => _obscureNew = !_obscureNew),
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'مطلوب';
@@ -122,7 +142,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       controller: _confirmPasswordController,
                       label: 'تأكيد كلمة المرور الجديدة',
                       prefixIcon: const Icon(Icons.lock_outline),
-                      isPassword: true,
+                      isPassword: _obscureConfirm,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirm
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () =>
+                            setState(() => _obscureConfirm = !_obscureConfirm),
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'مطلوب';
@@ -135,6 +164,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                     SizedBox(height: 40.h),
                     LoadingButton(
+                      margin: EdgeInsets.zero,
                       title: 'تغيير كلمة المرور',
                       onTap: _changePassword,
                       color: context.colors.primary,

@@ -7,6 +7,9 @@ class AppRoutes {
   static const String landing = '/';
   static const String adminLogin = '/admin-login';
   static const String adminDashboard = '/admin-dashboard';
+  static const String casesList = '/cases-list';
+  static const String donationsList = '/donations-list';
+  static const String donationDetails = '/donation-details';
   static const String caseRegistration = '/case-registration';
   static const String registrationSuccess = '/registration-success';
   static const String caseDetails = '/case-details';

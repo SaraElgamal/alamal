@@ -159,7 +159,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     style: TextStyle(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w800,
-          
+
                       color: context.colors.textSubtle,
                       height: 1.5,
                       letterSpacing: -0.5,
@@ -181,7 +181,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   validator: _validatePassword,
                   suffixIcon: InkWell(
                     child: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                     ),
                     onTap: () {
                       setState(() {
@@ -202,8 +204,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     ),
                   ),
                 ),
-                 SizedBox(height: 20.h),
-                 FadeInDown(
+                SizedBox(height: 20.h),
+                FadeInDown(
                   delay: const Duration(milliseconds: 200),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -228,8 +230,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     ],
                   ),
                 ),
-               
-               
               ],
             ),
           ),

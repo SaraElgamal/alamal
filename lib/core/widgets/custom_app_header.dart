@@ -108,19 +108,21 @@ class CustomAppHeader extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (actions != null) const Spacer(),
-                        Center(
-                          child: CustomText.headlineMedium(
-                            title,
-                            textAlign: TextAlign.center,
-                            textStyle: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(
-                                  color: context.colors.white,
-                                  fontSize: 20.sp,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                      //  if (actions != null) const Spacer(),
+                        Expanded(
+                          child: Center(
+                            child: CustomText.headlineMedium(
+                              title,
+                              textAlign: TextAlign.center,
+                              textStyle: Theme.of(context)
+                                  .textTheme
+                                  .headlineMedium
+                                  ?.copyWith(
+                                    color: context.colors.white,
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
                           ),
                         ),
                         if (actions != null) ...[...actions!],
